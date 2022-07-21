@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from "react";
-import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
-import fire from './fire';
+import {BrowserRouter as Router, Route} from 'react-router-dom';
+import fire_app from './fire';
 import './App.css';
-import Login from './components/Login';
-
-
+import Login from './pages/Login';
+import Main from './pages/Main';
+import "firebase/auth";
 
 const App = () => {
   const [user, setUser] = useState(''); 
@@ -26,7 +26,7 @@ const clearError = () =>{
 
 const handleLogin= () =>{
   clearError();
-  fire 
+  fire_app 
     .auth()
     .signInWithEmailAndPassword(email,password)
     .catch(err => {
@@ -44,7 +44,7 @@ const handleLogin= () =>{
 };
 const handleSignup = () =>{
   clearError();
-  fire 
+  fire_app 
     .auth()
     .createUserWithEmailAndPassword(email,password)
     .catch(err => {
@@ -61,7 +61,7 @@ const handleSignup = () =>{
   
 };
 const handleLogout = () => {
-  fire.auth().signOut();
+  fire_app.auth().signOut();
   
 };
 
@@ -69,7 +69,7 @@ const handleLogout = () => {
 
 
 const authListener = () => {
-  fire.auth().onAuthStateChanged(user =>{
+  fire_app.auth().onAuthStateChanged(user =>{
     if(user){
       clearInput();
       setUser(user);
@@ -86,21 +86,32 @@ useEffect(() => {
 
 
 return(
+  
   <div className="App">
-    <Router>
-      <Login 
-      email = {email} 
-      setEmail = {setEmail} 
-      password = {password}
-      setPassword = {setPassword}
-      handleLogin = {handleLogin}
-      handleSignup = {handleSignup}
-      hasAccount = {hasAccount}
-      setHasAccount ={setHasAccount}
-      emailError = {emailError}
-      passwordError = {passwordError}
-      />
-    </Router>
+ 
+    {user ? (
+      <Router>
+        <Route exact path="/">
+          <Main handleLogout ={handleLogout } user = {user} email = {email}  />
+        </Route>
+      </Router>
+      
+    ):(
+      <Router>
+        <Login 
+        email = {email} 
+        setEmail = {setEmail} 
+        password = {password}
+        setPassword = {setPassword}
+        handleLogin = {handleLogin}
+        handleSignup = {handleSignup}
+        hasAccount = {hasAccount}
+        setHasAccount ={setHasAccount}
+        emailError = {emailError}
+        passwordError = {passwordError}
+        />
+      </Router>
+    )}
   </div>
 );
 };

@@ -1,7 +1,5 @@
 import React from 'react';
 
-import logo from '../../public/static/images/logo.png';
-
 
 const Login = (props) => {
     const { email, setEmail, password, setPassword, handleLogin,
@@ -10,7 +8,7 @@ const Login = (props) => {
     return (
         <section className='login'>
             <div className="loginContainer">
-                <div align= "middle"><img src={ logo } width="150" height="150" alt="My_Logo"/></div>
+                <div align= "middle"><img src="/static/images/logo.png" width="150" height="150" alt="My_Logo"/></div>
                 <label>Username</label>
                 <input
                     type="text"

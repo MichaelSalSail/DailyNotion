@@ -1,16 +1,11 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-// import logo from '/static/images/logo.png'
-// import landingimg from '/static/images/productivity.png'
-// import profileIcon from '/static/images/profileIcon.png'
 
-
+// This page is 3 images and some text.
+// Logout button doesn't work.
 const Main = ({handleLogout, user, email}) =>{
-    
     return(
-       
         <div className="main">
- 
             <nav>
                 <Link to="/"><img src="/static/images/logo.png" width="150" height="150" alt="My_Logo"/></Link>
                 <div className="dropdown">
@@ -20,8 +15,6 @@ const Main = ({handleLogout, user, email}) =>{
                     </div>
                 </div>
             </nav>
-
-
             <div>
                 <h1 class = "heading">
                 Welcome
@@ -34,19 +27,15 @@ const Main = ({handleLogout, user, email}) =>{
             <div className = "paragraph">
                 <p><strong>
                 Hi
-                </strong>
-                </p>
+                </strong></p>
             </div>
             <div class = "footer">
                 <br/>
                 <p>CuratedProductivity</p>
                 <p> Copyright CuratedProductivity Inc 2022. All Rights Reserved.</p>
             </div>
-
-            
         </div>
-        
     );
-    
 };      
+
 export default Main;

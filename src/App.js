@@ -1,10 +1,13 @@
 import React, {useState, useEffect} from "react";
-import {BrowserRouter as Router, Route} from 'react-router-dom';
-import fire_app from './fire';
+import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import './App.css';
 import Login from './pages/Login';
 import Main from './pages/Main';
-import "firebase/auth";
+import fire_app from './fire';
+import { getAuth, signInWithEmailAndPassword, 
+         createUserWithEmailAndPassword, onAuthStateChanged, 
+         signOut} from "firebase/auth";
+const auth = getAuth(fire_app);
 
 const App = () => {
   // If true, display Main.jsx
@@ -31,9 +34,7 @@ const App = () => {
   // If so, go to the Home page (Main.jsx)
   const handleLogin= () =>{
     clearError();
-    fire_app 
-      .auth()
-      .signInWithEmailAndPassword(email,password)
+      signInWithEmailAndPassword(auth,email,password)
       .catch(err => {
         switch(err.code){
           case "auth/invalid-email":
@@ -52,9 +53,7 @@ const App = () => {
   // Upon success, updates the firebase project.
   const handleSignup = () =>{
     clearError();
-    fire_app 
-      .auth()
-      .createUserWithEmailAndPassword(email,password)
+      createUserWithEmailAndPassword(auth,email,password)
       .catch(err => {
         switch(err.code){
           case "auth/email-already-in-use":
@@ -69,13 +68,13 @@ const App = () => {
   };
 
   const handleLogout = () => {
-    fire_app.auth().signOut();
+    signOut(auth);
   };
 
   // Boolean('') = false
   // Boolean('anything') = true
   const authListener = () => {
-    fire_app.auth().onAuthStateChanged(user =>{
+    onAuthStateChanged(auth, (user) =>{
       if(user){
         clearInput();
         setUser(user);
@@ -98,24 +97,27 @@ const App = () => {
           then imported the file to App.js. I'll do that eventually so it looks neater.*/}
       {user ? (
         <Router>
-          <Route exact path="/">
-            <Main handleLogout ={handleLogout} user = {user} email = {email}  />
-          </Route>
+          <Routes>
+            <Route exact path="/" 
+                   element={<Main handleLogout={handleLogout} user={user} email={email}/>}/>
+          </Routes>
         </Router>
       ):(
         <Router>
-          <Login 
-          email = {email} 
-          setEmail = {setEmail} 
-          password = {password}
-          setPassword = {setPassword}
-          handleLogin = {handleLogin}
-          handleSignup = {handleSignup}
-          hasAccount = {hasAccount}
-          setHasAccount ={setHasAccount}
-          emailError = {emailError}
-          passwordError = {passwordError}
-          />
+          <Routes>
+            <Route exact path="/"
+                   element={<Login 
+                   email = {email} 
+                   setEmail = {setEmail} 
+                   password = {password}
+                   setPassword = {setPassword}
+                   handleLogin = {handleLogin}
+                   handleSignup = {handleSignup}
+                   hasAccount = {hasAccount}
+                   setHasAccount ={setHasAccount}
+                   emailError = {emailError}
+                   passwordError = {passwordError}/>}/>
+          </Routes>
         </Router>
       )}
     </div>

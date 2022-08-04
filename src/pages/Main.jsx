@@ -1,5 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import ButtonGroup from '@mui/material/ButtonGroup';
+import Button from '@mui/material/Button';
+
 
 // This page is 3 images and some text.
 // Logout button doesn't work.
@@ -28,6 +31,12 @@ const Main = ({handleLogout, user, email}) =>{
                 <p><strong>
                 Hi
                 </strong></p>
+                
+                <ButtonGroup variant="contained" aria-label="outlined primary button group">
+                <Button>One</Button>
+                <Button>Two</Button>
+                <Button>Three</Button>
+                </ButtonGroup>
             </div>
             <div class = "footer">
                 <br/>
@@ -37,5 +46,4 @@ const Main = ({handleLogout, user, email}) =>{
         </div>
     );
 };      
-
 export default Main;

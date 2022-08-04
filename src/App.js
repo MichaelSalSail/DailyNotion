@@ -3,6 +3,7 @@ import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import './App.css';
 import Login from './pages/Login';
 import Main from './pages/Main';
+import Quiz from './pages/Quiz';
 import fire_app from './fire';
 import { getAuth, signInWithEmailAndPassword, 
          createUserWithEmailAndPassword, onAuthStateChanged, 
@@ -119,7 +120,15 @@ const App = () => {
                    passwordError = {passwordError}/>}/>
           </Routes>
         </Router>
-      )}
+      )} {
+        <Router>
+        <Routes>
+        <Route exact path="/Quiz" 
+                 element={<Quiz/>}/>
+        </Routes>
+      </Router>
+
+      }
     </div>
   );
 };

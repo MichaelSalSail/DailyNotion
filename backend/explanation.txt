@@ -1,5 +1,0 @@
-Created the backend folder to interact w/ the Notion JS SDK
-
-The code will only work with your own unique:
-1. Integration token_id
-2. Database token_id

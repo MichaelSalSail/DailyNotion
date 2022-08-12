@@ -65,35 +65,21 @@ const StyledRating = styled(Rating)(({ theme }) => ({
 
   
 
-const Quiz= ({}) =>{
+const  ratings= ({}) =>{
     return(
-        <div className="main">
-            <div>
-                <Card sx={{ maxWidth: 275 }}>
-                <CardContent >
-                    How are you feeling today?
-                    <StyledRating
-                    size="large"
-                    name="highlight-selected-only"
-                    defaultValue={3}
-                    IconContainerComponent={IconContainer}
-                    getLabelText={(value) => customIcons[value].label}
-                    highlightSelectedOnly
-                    />
-                </CardContent>
-                <CardActions>
-                    <Button size="small">Submit</Button>
-                </CardActions>
-                </Card>
+                
+        
+        <StyledRating
+        size="large"
+        name="highlight-selected-only"
+        defaultValue={3}
+        IconContainerComponent={IconContainer}
+        getLabelText={(value) => customIcons[value].label}
+        highlightSelectedOnly
+        />
+              
 
-            </div>
-            <div class = "footer">
-                <br/>
-                <p>CuratedProductivity</p>
-                <p> Copyright CuratedProductivity Inc 2022. All Rights Reserved.</p>
-            </div>
-        </div>
     );
 };      
 
-export default Quiz;
+export default ratings;

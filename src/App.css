@@ -95,12 +95,7 @@ button {
   width: 100%;
   min-height: 100vh;
   padding:50px;
-  background: radial-gradient(
-    ellipse at left bottom,
-    rgb(0, 0, 0) 0%,
-    rgba(0, 0, 0, 0.9) 59%,
-    rgba(0, 0, 0, 0.9) 100%
-  );
+  background: white;
 }
 
 .main nav {
@@ -219,4 +214,12 @@ a:visited {
 
 .paragraph{
   color: white;
+}
+
+.center-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }

@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
+import ResponsiveAppBar from './components/navbar.jsx'
 
 
 // This page is 3 images and some text.
@@ -9,15 +10,16 @@ import Button from '@mui/material/Button';
 const Main = ({handleLogout, user, email}) =>{
     return(
         <div className="main">
-            <nav>
-                <Link to="/"><img src="/static/images/logo.png" width="150" height="150" alt="My_Logo"/></Link>
+{/*             <nav>
+                <Link to="/"><img src="/static/images/logo.svg" width="150" height="150" alt="My_Logo"/></Link>
                 <div className="dropdown">
                     <img src="/static/images/profileIcon.png" width="150" height="150" alt="profileIcon"/>
                     <div className="dropdown-content">
                         <button className="dropdown-button" onClick={handleLogout}>Logout</button>
                     </div>
                 </div>
-            </nav>
+            </nav> */}
+            
             <div>
                 <h1 class = "heading">
                 Welcome
@@ -30,13 +32,7 @@ const Main = ({handleLogout, user, email}) =>{
             <div className = "paragraph">
                 <p><strong>
                 Hi
-                </strong></p>
-                
-                <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                <Button>One</Button>
-                <Button>Two</Button>
-                <Button>Three</Button>
-                </ButtonGroup>
+                </strong></p>          
             </div>
             <div class = "footer">
                 <br/>

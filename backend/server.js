@@ -17,22 +17,74 @@ const PORT = 4000;
 const HOST = "localhost";
 
 // integration token
-const client = new Client({ auth : get_notion_tokens.intgr_token});
+const notion = new Client({ auth : get_notion_tokens.intgr_token});
 // database token
 const databaseId = get_notion_tokens.page_token;
 
 // POST request
 // POST name, phoneNumber, extraInfo
 // Functionality: Make a database entry in a Notion page w/ the databaseId above
+// localhost:4000/submitFormNotion
+app.post('/submitFormToNotion', jsonParser, async (req, res) => {
+    // req.body
+    /*{
+        name: "Michael Salamon",
+        phoneNumber: "Michael Salamon",
+        extraInfo: "Michael Salamon"
+    }*/
+    const name = req.body.name;
+    const phoneNumber = req.body.phoneNumber;
+    const extraInfo = req.body.extraInfo;
+
+    try {
+        const response = await notion.pages.create({
+            parent: { database_id: databaseId },
+            properties: {
+                Name: {
+                    title: [
+                        {
+                            text: {
+                                content: name
+                            }
+                        }
+                    ]
+                },
+                "Phone Number": {
+                    rich_text: [
+                        {
+                            text: {
+                                content: phoneNumber
+                            }
+                        }
+                    ]
+                },
+                "Extra Information": {
+                    rich_text: [
+                        {
+                            text: {
+                                content: extraInfo
+                            }
+                        }
+                    ]
+                }
+            }
+        })
+        console.log(response);
+        console.log("SUCCESS!")
+    }
+    catch(error) {
+        console.log(error);
+    }
+});
+
+// To-do:
+// 1. Change POST request to contain hard-coded data
+// 2. Make a GET request that extracts relevant data
 
 
 app.listen(PORT, HOST, () => {
     console.log("Starting proxy at " + HOST + ":" + PORT); // localhost:4000
 });
 
-// To-do:
-// 1. Write all the server.js code from the video
-// 2. Edit the code to remove interaction w/ app.js. The POST
-//    request will only use hard-coded values from this value.
-//    No interaction w/ user. On success, console.log("Success")
+
 

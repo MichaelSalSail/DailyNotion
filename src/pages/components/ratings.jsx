@@ -65,7 +65,7 @@ const StyledRating = styled(Rating)(({ theme }) => ({
 
   
 
-const  ratings= ({}) =>{
+const  Ratings= ({}) =>{
     return(
                 
         
@@ -82,4 +82,4 @@ const  ratings= ({}) =>{
     );
 };      
 
-export default ratings;
+export default Ratings;

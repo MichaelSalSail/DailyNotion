@@ -2,7 +2,6 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
-import ResponsiveAppBar from './components/navbar.jsx'
 
 import MaterialUIPickers from './datepicker.jsx'
 import RadioGroupRating from './ratings.jsx'
@@ -63,24 +62,6 @@ function TabPanel(props) {
     return (
       <Box sx={{ width: '100%' }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Typography
-            variant="h6"
-            noWrap
-            component="a"
-            href="/"
-            sx={{
-              mr: 2,
-              display: { xs: 'none', md: 'flex' },
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-              margin: '3em'
-            }}
-          >
-            DAILY NOTION
-          </Typography>
           <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" centered>
             
             <Tab icon={<DailyCheckIcon/>} label="Daily Check In" {...a11yProps(0)} />
@@ -112,6 +93,7 @@ function TabPanel(props) {
           Item Two
         </TabPanel>
         <TabPanel value={value} index={2}>
+        {/* TO DO: Settings page => update username, update notion API, log out, delete acct*/}
           Item Three
         </TabPanel>
       </Box>
@@ -123,7 +105,6 @@ function TabPanel(props) {
 
 const Main = ({handleLogout, user, email}) =>{
     return(
-<<<<<<< HEAD
         <div className="main">
 {/*             <nav>
                 <Link to="/"><img src="/static/images/logo.svg" width="150" height="150" alt="My_Logo"/></Link>
@@ -135,31 +116,9 @@ const Main = ({handleLogout, user, email}) =>{
                 </div>
             </nav> */}
             
-            <div>
-                <h1 class = "heading">
-                Welcome
-                <p>Idk this is home</p>
-                </h1>
-            </div>
-            <div>
-                <img class = "landing-img" src = "/static/images/productivity.png"/>
-            </div>
-            <div className = "paragraph">
-                <p><strong>
-                Hi
-                </strong></p>          
-            </div>
-            <div class = "footer">
-                <br/>
-                <p>CuratedProductivity</p>
-                <p> Copyright CuratedProductivity Inc 2022. All Rights Reserved.</p>
-=======
-        
-        <div>
 
             <div>
               <BasicTabs></BasicTabs>
->>>>>>> 1e0986a5d46c22a3b6ddd89a2348e58d15a6c513
             </div>
 
 

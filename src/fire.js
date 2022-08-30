@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import {initializeApp} from 'firebase/app'
-import {getDatabase, ref, set} from 'firebase/database';
+import {getDatabase, ref, set, child, get} from 'firebase/database';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -43,8 +43,6 @@ function writeUserQueAns (useremail, allAns, mood, cred, ntn_space, allQue, ntn_
   const rsrc_ref_2 = ref(db, 'references/templates');
   set(rsrc_ref_2, ntn_templ);
 }
-
-// GET to Firebase Realtime
 
 
 // Option Menus for Questionnaire
@@ -131,7 +129,19 @@ const exmpl_cred={
 //    sounds exciting!
 const ntn_space_info={
   last_edit_tmpl: 'Tue Aug 02 2022 21:21:00 GMT-0400 (Eastern Daylight Time)',
-  last_edit_proj: 'Tue Aug 02 2022 21:21:00 GMT-0400 (Eastern Daylight Time)'
+  last_edit_proj: 'Tue Aug 03 2022 21:21:00 GMT-0400 (Eastern Daylight Time)'
 }
 
 writeUserQueAns("michaelsalamon78", exmpl_answ, exmpl_mood, exmpl_cred, ntn_space_info, exmpl_ques, ntn_links);
+
+// GET to Firebase Realtime
+const dbRef = ref(getDatabase());
+get(child(dbRef, `users`)).then((snapshot) => {
+  if (snapshot.exists()) {
+    console.log(snapshot.val());
+  } else {
+    console.log("No data available");
+  }
+}).catch((error) => {
+  console.error(error);
+});

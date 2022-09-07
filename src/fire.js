@@ -24,7 +24,7 @@ const fire_app = initializeApp(firebaseConfig);
 export default fire_app;
 
 // POST to Firebase Realtime
-function writeUserQueAns (useremail, allAns, mood, cred, ntn_space, allQue, ntn_templ) {
+function writeUserQueAns (useremail, allAns, mood, project, template, allQue, ntn_templ) {
   const db = getDatabase();
 
   // users -> userId -> ...
@@ -32,10 +32,10 @@ function writeUserQueAns (useremail, allAns, mood, cred, ntn_space, allQue, ntn_
   set(user_ref_1, allAns);
   const user_ref_2 = ref(db, 'users/' + useremail + '/daily_mood');
   set(user_ref_2, mood);
-  const user_ref_3 = ref(db, 'users/' + useremail + '/notion_tokens');
-  set(user_ref_3, cred);
-  const user_ref_4 = ref(db, 'users/' + useremail + '/notion_info');
-  set(user_ref_4, ntn_space);
+  const user_ref_3 = ref(db, 'users/' + useremail + '/project');
+  set(user_ref_3, project);
+  const user_ref_4 = ref(db, 'users/' + useremail + '/template');
+  set(user_ref_4, template);
 
   // references -> ...
   const rsrc_ref_1 = ref(db, 'references/questionnaire');
@@ -112,27 +112,58 @@ const exmpl_mood={
   // todays_date: scale of 1 to 5 (1 is sad, 5 is happy)
   date_08_30_2022: 1
 }
-// 3. Credentials for Project Space and Curated Template Space
-const exmpl_cred={
-  proj_cred: {
+// 3. User must submit project dates and associated tokens.
+//    Our API can now track the project page during these dates.
+const project_space={
+  tokens: {
     intgr_token: "Internal_Integration_token_value",
     page_token: "Database_token_value"
   },
-  tmpl_cred: {
-    intgr_token: "Internal_Integration_token_value",
-    page_token: "Database_token_value"
+  timeline: {
+    start_date: "09/07/2022",
+    end_date: "10/06/2022"
+  },
+  // We need to automate API calls.
+  // Idk how we're going to do it, but it sounds exciting!
+  api_resp: {
+    // I'm thinking we schedule API calls daily at 11:59PM everyday.
+    date_08_30_2022: {
+      last_edit: "17:08:00 GMT-0400 (Eastern Daylight Time)"
+    }
   }
 }
-// 4. Info about project and template space
-//    This will require automated API calls.
-//    Idk how we're going to do it, but it 
-//    sounds exciting!
-const ntn_space_info={
-  last_edit_tmpl: 'Tue Aug 02 2022 21:21:00 GMT-0400 (Eastern Daylight Time)',
-  last_edit_proj: 'Tue Aug 03 2022 21:21:00 GMT-0400 (Eastern Daylight Time)'
+// 4. User must create a copy of our template in their workspace. 
+//    User must submit associated tokens.
+//    Our API can now track the template page during these dates.
+const template_space={
+  tokens: {
+    intgr_token: "Internal_Integration_token_value",
+    page_token: "Database_token_value"
+  },
+  api_resp: {
+    days: {
+      date_08_30_2022: {
+        // probably not as important as for the project page, but who knows
+        // I'm thinking we schedule API calls daily at 11:59PM everyday.
+        last_edit: "21:21:00 GMT-0400 (Eastern Daylight Time)"
+      }
+    },
+    weeks: {
+      end_week_1: {
+        // If exactly one week has passed since template tokens submitted, 
+        // or since our last API calls, do the following:
+        // First, make a GET request to view all entries from the current week.
+        // Count the entries that are NOT blank.
+        // Value should range from 0-4 since each template only has 4 columns.
+        cells_complete: 4
+        // Last, we make an API POST request to add another row to the database
+        // so the user can write entries for the next week.
+      }
+    }
+  }
 }
 
-writeUserQueAns("michaelsalamon78", exmpl_answ, exmpl_mood, exmpl_cred, ntn_space_info, exmpl_ques, ntn_links);
+writeUserQueAns("michaelsalamon78", exmpl_answ, exmpl_mood, project_space, template_space, exmpl_ques, ntn_links);
 
 // GET to Firebase Realtime
 const dbRef = ref(getDatabase());

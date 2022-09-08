@@ -60,6 +60,19 @@ function read_que_ans(user_id) {
   });
 }
 
+// Call this function upon successful user registration
+function set_new_user(user_json, user_email) {
+  // sanitize user_email to become user_id.
+  // user_id must be a valid Firebase Realtime node name.
+  // replace the @ and . chars w/ underscores.
+  // const user_id=REGEX(user_email, ["@","."], "_");
+  // rename user 'example' to user_id
+  // user_json[user_id] = user_json["example"];
+  // delete user_json[oldKey];
+  // POST to repo
+  // writeUserInfo(user_json);
+}
+
 // Option Menus for Questionnaire
 // aka: associated mental conditions [common issue, adhd, depression, anxiety]
 const prod_problms=["Procrastination",
@@ -199,3 +212,23 @@ writeUserInfo(example_all);
 
 // user "example" is a dummy example
 read_que_ans("example");
+
+// make a blank template for new users
+let user_skeleton= {
+  example: {
+    ques_respon: { answ_1: "", answ_2: "", answ_3: [""], answ_4: [""], answ_5: [""], answ_6: [""] },
+    daily_mood: { date_00_00_0000: -1 },
+    project: {
+      tokens: { intgr_token: "", page_token: "" },
+      timeline: { start_date: "", end_date: "" },
+      api_resp: { date_00_00_0000: { last_edit: "" } }
+    },
+    template: {
+      tokens: { intgr_token: "", page_token: "" },
+      api_resp: { 
+        days: { date_00_00_0000: { last_edit: ""} },
+        weeks: { end_week_0: { cells_complete: -1}}
+      }
+    }
+  }
+}

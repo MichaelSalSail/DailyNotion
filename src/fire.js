@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import {initializeApp} from 'firebase/app'
-import {getDatabase, ref, set, child, get} from 'firebase/database';
+import {getDatabase, ref, onValue, set, child, get} from 'firebase/database';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -166,13 +166,26 @@ const template_space={
 writeUserQueAns("michaelsalamon78", exmpl_answ, exmpl_mood, project_space, template_space, exmpl_ques, ntn_links);
 
 // GET to Firebase Realtime
-const dbRef = ref(getDatabase());
-get(child(dbRef, `users`)).then((snapshot) => {
+/*const dbRef = getDatabase();
+// child(dbRef, `users`))
+get(ref(getDatabase()).then((snapshot) => {
   if (snapshot.exists()) {
-    console.log(snapshot.val());
+    console.log("User: michaelsalamon78")
+    console.log(JSON.stringify(snapshot.val()["references"]["questionnaire"]["ques_1"]));
+    console.log(JSON.stringify(snapshot.val()["michaelsalamon78"]["ques_respon"]["answ_1"]));
   } else {
     console.log("No data available");
   }
 }).catch((error) => {
   console.error(error);
+}));*/
+
+const db = getDatabase();
+onValue(ref(db), (snapshot) => {
+  console.log("User: michaelsalamon78")
+  for(let i=1; i<7; i++)
+  {
+    console.log("Q"+String(i)+". ",snapshot.val()["references"]["questionnaire"]["ques_"+String(i)]["que"]);
+    console.log("A"+String(i)+". ",snapshot.val()["users"]["michaelsalamon78"]["ques_respon"]["answ_"+String(i)]);
+  }
 });

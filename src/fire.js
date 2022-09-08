@@ -23,27 +23,42 @@ const fire_app = initializeApp(firebaseConfig);
 
 export default fire_app;
 
-// POST to Firebase Realtime
-function writeUserQueAns (useremail, allAns, mood, project, template, allQue, ntn_templ) {
+// POST references under 'references' node on Firebase Realtime
+function writeRefrnces(refr_info) {
   const db = getDatabase();
-
-  // users -> userId -> ...
-  const user_ref_1 = ref(db, 'users/' + useremail + '/ques_respon');
-  set(user_ref_1, allAns);
-  const user_ref_2 = ref(db, 'users/' + useremail + '/daily_mood');
-  set(user_ref_2, mood);
-  const user_ref_3 = ref(db, 'users/' + useremail + '/project');
-  set(user_ref_3, project);
-  const user_ref_4 = ref(db, 'users/' + useremail + '/template');
-  set(user_ref_4, template);
-
   // references -> ...
   const rsrc_ref_1 = ref(db, 'references/questionnaire');
-  set(rsrc_ref_1, allQue);
+  set(rsrc_ref_1, refr_info["references"]["questionnaire"]);
   const rsrc_ref_2 = ref(db, 'references/templates');
-  set(rsrc_ref_2, ntn_templ);
+  set(rsrc_ref_2, refr_info["references"]["templates"]);
 }
 
+// POST user data under 'users' node on Firebase Realtime
+function writeUserInfo(user_info) {
+  const db = getDatabase();
+  let user_id=Object.getOwnPropertyNames(user_info)[0]
+  let num_user_props=Object.getOwnPropertyNames(user_info[user_id]).length
+  for(let i=0; i<num_user_props; i++)
+  {
+    let current=Object.getOwnPropertyNames(user_info[user_id])[i]
+    // users -> userId -> ...
+    const user_ref = ref(db, 'users/' + user_id + '/' + current);
+    set(user_ref, user_info[user_id][current]);
+  }
+}
+
+// GET question+response data on user user_id through Firebase Realtime
+function read_que_ans(user_id) {
+  const db = getDatabase();
+  onValue(ref(db), (snapshot) => {
+    console.log("User:", user_id);
+    for(let i=1; i<7; i++)
+    {
+      console.log("Q"+String(i)+". ",snapshot.val()["references"]["questionnaire"]["ques_"+String(i)]["que"]);
+      console.log("A"+String(i)+". ",snapshot.val()["users"][user_id]["ques_respon"]["answ_"+String(i)]);
+    }
+  });
+}
 
 // Option Menus for Questionnaire
 // aka: associated mental conditions [common issue, adhd, depression, anxiety]
@@ -96,6 +111,15 @@ const ntn_links={
   anti_ngtve: "https://giant-hammer-3aa.notion.site/Positivity-7e72ad86fd494f759d521ea0bd3aff34",
   anti_ovrwk: "https://giant-hammer-3aa.notion.site/Balance-8a5826b3236d4fec9f300d140dd169c8"
 }
+// putting everything together
+let refrnces_all={
+  references: {
+    questionnaire: exmpl_ques,
+    templates: ntn_links
+  }
+}
+// only needs to be called once but watev
+writeRefrnces(refrnces_all);
 
 // USERS
 // 1. Questionnaire responses
@@ -162,30 +186,16 @@ const template_space={
     }
   }
 }
-
-writeUserQueAns("michaelsalamon78", exmpl_answ, exmpl_mood, project_space, template_space, exmpl_ques, ntn_links);
-
-// GET to Firebase Realtime
-/*const dbRef = getDatabase();
-// child(dbRef, `users`))
-get(ref(getDatabase()).then((snapshot) => {
-  if (snapshot.exists()) {
-    console.log("User: michaelsalamon78")
-    console.log(JSON.stringify(snapshot.val()["references"]["questionnaire"]["ques_1"]));
-    console.log(JSON.stringify(snapshot.val()["michaelsalamon78"]["ques_respon"]["answ_1"]));
-  } else {
-    console.log("No data available");
+// putting everything together
+let example_all={
+  example: {
+    ques_respon: exmpl_answ,
+    daily_mood: exmpl_mood,
+    project: project_space,
+    template: template_space
   }
-}).catch((error) => {
-  console.error(error);
-}));*/
+}
+writeUserInfo(example_all);
 
-const db = getDatabase();
-onValue(ref(db), (snapshot) => {
-  console.log("User: michaelsalamon78")
-  for(let i=1; i<7; i++)
-  {
-    console.log("Q"+String(i)+". ",snapshot.val()["references"]["questionnaire"]["ques_"+String(i)]["que"]);
-    console.log("A"+String(i)+". ",snapshot.val()["users"]["michaelsalamon78"]["ques_respon"]["answ_"+String(i)]);
-  }
-});
+// user "example" is a dummy example
+read_que_ans("example");

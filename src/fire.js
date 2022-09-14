@@ -21,8 +21,6 @@ const firebaseConfig = {
 // Initialize Firebase
 const fire_app = initializeApp(firebaseConfig);
 
-export default fire_app;
-
 // POST references under 'references' node on Firebase Realtime
 function writeRefrnces(refr_info) {
   const db = getDatabase();
@@ -65,12 +63,13 @@ function set_new_user(user_json, user_email) {
   // sanitize user_email to become user_id.
   // user_id must be a valid Firebase Realtime node name.
   // replace the @ and . chars w/ underscores.
-  // const user_id=REGEX(user_email, ["@","."], "_");
+  let reg_exp=/[@.]/g;
+  const user_id=user_email.replaceAll(reg_exp,"_");
   // rename user 'example' to user_id
-  // user_json[user_id] = user_json["example"];
-  // delete user_json[oldKey];
+  user_json[user_id] = user_json["example"];
+  delete user_json["example"];
   // POST to repo
-  // writeUserInfo(user_json);
+  writeUserInfo(user_json);
 }
 
 // Option Menus for Questionnaire
@@ -232,3 +231,11 @@ let user_skeleton= {
     }
   }
 }
+
+let fireDB = {
+  fire_app: fire_app,
+  user_skeleton: user_skeleton,
+  set_new_user: set_new_user
+};
+
+export default fireDB;

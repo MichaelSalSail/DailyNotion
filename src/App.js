@@ -3,11 +3,11 @@ import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import './App.css';
 import Login from './pages/Login';
 import Main from './pages/Main';
-import fire_app from './fire';
 import { getAuth, signInWithEmailAndPassword, 
-         createUserWithEmailAndPassword, onAuthStateChanged, 
-         signOut} from "firebase/auth";
-const auth = getAuth(fire_app);
+  createUserWithEmailAndPassword, onAuthStateChanged, 
+  signOut} from "firebase/auth";
+import fireDB from './fire.js';
+const auth = getAuth(fireDB.fire_app);
 
 const App = () => {
   // If true, display Main.jsx
@@ -53,18 +53,21 @@ const App = () => {
   // Upon success, updates the firebase project.
   const handleSignup = () =>{
     clearError();
-      createUserWithEmailAndPassword(auth,email,password)
-      .catch(err => {
-        switch(err.code){
-          case "auth/email-already-in-use":
-          case "auth/invalid-email":
-            setEmailError(err.message);
-            break;
-          case "auth/weak-password":
-            setPasswordError(err.message);
-            break;
-        }
-      });
+    createUserWithEmailAndPassword(auth,email,password)
+    .catch(err => {
+      switch(err.code) {
+        case "auth/email-already-in-use":
+        case "auth/invalid-email":
+          setEmailError(err.message);
+          break;
+        case "auth/weak-password":
+          setPasswordError(err.message);
+          break;
+      }
+    });
+    // new entry under node 'Users' in Firebase Realtime
+    fireDB.set_new_user(fireDB.user_skeleton,email);
+
   };
 
   const handleLogout = () => {

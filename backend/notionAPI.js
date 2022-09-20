@@ -29,7 +29,7 @@ const getTemplate = async (templateIntgr, templateId) => {
         console.log("getTemplate()", error);
     }
 };
-getTemplate(templateIntgr,templateId);
+// getTemplate(templateIntgr,templateId);
 
 // Adds a new entry to DailyNotion template space
 const updateTemplate = async (templateIntgr, templateId, templText) => { 
@@ -95,9 +95,29 @@ let templText=["1",
                "[What is your most recent success? How proud are you from a scale of 1-10?]",
                "[What excites you about your current project?]",
                "[Write down 1 reason you should feel confident working on your project this week.]"]
-updateTemplate(templateIntgr,templateId, templText);
+// updateTemplate(templateIntgr,templateId, templText);
 
 // Adds a new comment to user project space
-const msgProject = async () => {
-
+const msgProject = async (projIntgr, projId, feedback) => {
+    try {
+        const response = await projIntgr.comments.create({
+            parent: {
+                "page_id": projId
+            },
+            rich_text: [
+                {
+                    "text": {
+                    "content": feedback
+                    }
+                }
+            ]
+        });
+        console.log("msgProject()", response);
+    }
+    catch(error)
+    {
+        console.log("msgProject()", error);
+    }
 };
+let comment = "You're doing great! Keep it up."
+msgProject(projIntgr,projId,comment);

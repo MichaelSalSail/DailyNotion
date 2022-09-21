@@ -18,7 +18,6 @@ const getTemplate = async (templateIntgr, templateId) => {
         // 4 relevant elements
         const responseResults = {
             db_name: response.title[0].plain_text,
-            is_inline: response.is_inline,
             // ISO 8601 time -> Date object -> String
             db_init_time: new Date(response.created_time).toString('en', {timezone: 'EST'}),
             db_last_edit_time: new Date(response.last_edited_time).toString('en', {timezone: 'EST'})
@@ -29,7 +28,7 @@ const getTemplate = async (templateIntgr, templateId) => {
         console.log("getTemplate()", error);
     }
 };
-// getTemplate(templateIntgr,templateId);
+getTemplate(templateIntgr,templateId);
 
 // Adds a new entry to DailyNotion template space
 const updateTemplate = async (templateIntgr, templateId, templText) => { 
@@ -97,7 +96,29 @@ let templText=["1",
                "[Write down 1 reason you should feel confident working on your project this week.]"]
 // updateTemplate(templateIntgr,templateId, templText);
 
-// Adds a new comment to user project space
+
+// Collects user activity on project space
+const getProject = async (projIntgr, projId) => {
+    try 
+    {
+        // 12 element json
+        const response = await projIntgr.pages.retrieve({ page_id: projId });
+        // 4 relevant elements
+        const responseResults = {
+            pg_name: response.properties.title.title[0].plain_text,
+            // ISO 8601 time -> Date object -> String
+            pg_init_time: new Date(response.created_time).toString('en', {timezone: 'EST'}),
+            pg_last_edit_time: new Date(response.last_edited_time).toString('en', {timezone: 'EST'})
+        };
+        console.log("getProject()", responseResults);
+    }
+    catch(error) {
+        console.log("getProject()", error);
+    }
+};
+getProject(projIntgr,projId);
+
+// Adds a new comment to project space
 const msgProject = async (projIntgr, projId, feedback) => {
     try {
         const response = await projIntgr.comments.create({
@@ -120,4 +141,4 @@ const msgProject = async (projIntgr, projId, feedback) => {
     }
 };
 let comment = "You're doing great! Keep it up."
-msgProject(projIntgr,projId,comment);
+// msgProject(projIntgr,projId,comment);

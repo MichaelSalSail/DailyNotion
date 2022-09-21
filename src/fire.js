@@ -45,6 +45,35 @@ function writeUserInfo(user_info) {
   }
 }
 
+// CONVERT user_email to user_id
+function getUserID(user_email){
+  let reg_exp=/[@.]/g;
+  const user_id=user_email.replaceAll(reg_exp,"_");
+  return user_id
+}
+
+
+// GET check if user_ID has completed onboarding (check for non-empty que and ans) // if ANY is empty, return false
+function checkOnboarded(user_id){
+  const db = getDatabase();
+  let res = false
+  onValue(ref(db), (snapshot) => {
+      for(let i = 1; i < 7; i++){
+        if (!snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)] || snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)].length == 0 ) {
+            //console.log("false!!" + snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)].length);
+            break;
+        } else {
+          res = true // only returns true if every ans is non-empty
+        }
+      }
+      
+  })
+  return res
+  // !String(i) || String(i).length == 0
+}
+
+
+
 // GET question+response data on user user_id through Firebase Realtime
 function read_que_ans(user_id) {
   const db = getDatabase();
@@ -211,7 +240,7 @@ writeUserInfo(example_all);
 
 // user "example" is a dummy example
 read_que_ans("example");
-
+checkOnboarded("example");
 // make a blank template for new users
 let user_skeleton= {
   example: {
@@ -235,7 +264,9 @@ let user_skeleton= {
 let fireDB = {
   fire_app: fire_app,
   user_skeleton: user_skeleton,
-  set_new_user: set_new_user
+  set_new_user: set_new_user,
+  checkOnboarded: checkOnboarded,
+  getUserID: getUserID
 };
 
 export default fireDB;

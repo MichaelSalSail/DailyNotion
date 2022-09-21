@@ -1,18 +1,27 @@
 import React, {useState, useEffect} from "react";
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+
 import './App.css';
 import Login from './pages/Login';
 import Main from './pages/Main';
+import Onboarding from "./pages/Onboarding";
+
 import { getAuth, signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, onAuthStateChanged, 
   signOut} from "firebase/auth";
 import fireDB from './fire.js';
+
 const auth = getAuth(fireDB.fire_app);
 
 const App = () => {
   // If true, display Main.jsx
   // If false, display Login.jsx
   const [user, setUser] = useState('');
+
+  // if false, display Onboarding.jsx
+  const [hasOnboarded, setOnboard] = useState(false);
+
   // 5 of the 10 parameters required for the Login function
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -47,6 +56,9 @@ const App = () => {
             break;
         }
       });
+      //console.log(fireDB.checkOnboarded("example"))
+      console.log(fireDB.getUserID(email))
+      setOnboard(fireDB.checkOnboarded("example")) 
   };
 
   // Prevents the user from signing up for 3 cases.
@@ -67,7 +79,6 @@ const App = () => {
     });
     // new entry under node 'Users' in Firebase Realtime
     fireDB.set_new_user(fireDB.user_skeleton,email);
-
   };
 
   const handleLogout = () => {
@@ -93,16 +104,25 @@ const App = () => {
     authListener();
   }, []);
 
-
+  
   return(
     <div className="App">
       {/* In my other project, my team created a 'routes.js' to clearly label all web app links
-          then imported the file to App.js. I'll do that eventually so it looks neater.*/}
+          then imported the file to App.js. I'll do that eventually so it looks neater.
+          
+          { user ? (onboarding ? (<Router></Router>):(<Router></Router>)):(<Router></Router>)
+          */}
+      
+
+      
       {user ? (
         <Router>
           <Routes>
             <Route exact path="/" 
-                   element={<Main handleLogout={handleLogout} user={user} email={email}/>}/>
+                   element={<Navigate to="/onboarding"/>}/>
+
+            <Route exact path="/onboarding" 
+                   element={<Onboarding handleLogout={handleLogout} user={user} email={email}/>}/>
           </Routes>
         </Router>
       ):(
@@ -123,6 +143,10 @@ const App = () => {
           </Routes>
         </Router>
       )}
+
+
+    
+
     </div>
   );
 };

@@ -1,36 +1,33 @@
 const { Client } = require('@notionhq/client');
-
 const notion_info=require('./notion_tokens.js');
 
-// Access template page
-const templateIntgr = new Client({ auth : notion_info.template.tokens.intgr_token});
-const templateId = notion_info.template.tokens.page_token;
-// Access project page
-const projIntgr = new Client({ auth : notion_info.project.tokens.intgr_token});
-const projId = notion_info.project.tokens.page_token;
-
-// Collects user activity on curated DailyNotion template space
+/**
+ * Collects user activity on curated DailyNotion template space
+ * @param {string} templateIntgr - associated template integration token
+ * @param {string} templateId - template page id
+ * @return {json} - all relevant page info
+ */
 const getTemplate = async (templateIntgr, templateId) => {
-    try 
-    {
-        // 15 element json
-        const response = await templateIntgr.databases.retrieve({ database_id: templateId });
-        // 4 relevant elements
-        const responseResults = {
-            db_name: response.title[0].plain_text,
-            // ISO 8601 time -> Date object -> String
-            db_init_time: new Date(response.created_time).toString('en', {timezone: 'EST'}),
-            db_last_edit_time: new Date(response.last_edited_time).toString('en', {timezone: 'EST'})
-        };
-        console.log("getTemplate()", responseResults);
-    }
-    catch(error) {
-        console.log("getTemplate()", error);
-    }
+    // 15 element json
+    const response = await templateIntgr.databases.retrieve({ database_id: templateId });
+    // 4 relevant elements
+    const responseResults = {
+        db_name: response.title[0].plain_text,
+        // ISO 8601 time -> Date object -> String
+        db_init_time: new Date(response.created_time).toString('en', {timezone: 'EST'}),
+        db_last_edit_time: new Date(response.last_edited_time).toString('en', {timezone: 'EST'})
+    };
+    console.log("getTemplate()", responseResults);
+    return responseResults;
 };
-// getTemplate(templateIntgr,templateId);
 
-// Adds a new entry to DailyNotion template space
+/**
+ * Adds a new entry to DailyNotion template space
+ * @param {string} templateIntgr - associated template integration token
+ * @param {string} templateId - template page id
+ * @param {string array} templText - text to put in each database property
+ * @return {json} - all relevant page info
+ */
 const updateTemplate = async (templateIntgr, templateId, templText) => {
     const brackets= {
         open: {
@@ -46,91 +43,153 @@ const updateTemplate = async (templateIntgr, templateId, templText) => {
             italic: true
         }
     }
-    try {
-        const response = await templateIntgr.pages.create({
-            parent: { database_id: templateId },
-            properties: {
-                Week: {
-                    title: [
-                        {
-                            text: {
-                                content: templText[0]
-                            }
+
+    const response = await templateIntgr.pages.create({
+        parent: { database_id: templateId },
+        properties: {
+            Week: {
+                title: [
+                    {
+                        text: {
+                            content: templText[0]
                         }
-                    ]
-                },
-                "Question 1": {
-                    rich_text: [
-                        {
-                            text: brackets["open"]
+                    }
+                ]
+            },
+            "Question 1": {
+                rich_text: [
+                    {
+                        text: brackets["open"]
+                    },
+                    {
+                        text: {
+                            content: templText[1]
                         },
-                        {
-                            text: {
-                                content: templText[1]
-                            },
-                            annotations: question["annotations"]
+                        annotations: question["annotations"]
+                    },
+                    {
+                        text: brackets["closed"]
+                    }
+                ]
+            },
+            "Question 2": {
+                rich_text: [
+                    {
+                        text: brackets["open"]
+                    },
+                    {
+                        text: {
+                            content: templText[2]
                         },
-                        {
-                            text: brackets["closed"]
-                        }
-                    ]
-                },
-                "Question 2": {
-                    rich_text: [
-                        {
-                            text: brackets["open"]
+                        annotations: question["annotations"]
+                    },
+                    {
+                        text: brackets["closed"]
+                    }
+                ]
+            },
+            "Question 3": {
+                rich_text: [
+                    {
+                        text: brackets["open"]
+                    },
+                    {
+                        text: {
+                            content: templText[3]
                         },
-                        {
-                            text: {
-                                content: templText[2]
-                            },
-                            annotations: question["annotations"]
+                        annotations: question["annotations"]
+                    },
+                    {
+                        text: brackets["closed"]
+                    }                      
+                ]
+            },
+            "Question 4": {
+                rich_text: [
+                    {
+                        text: brackets["open"]
+                    },
+                    {
+                        text: {
+                            content: templText[4]
                         },
-                        {
-                            text: brackets["closed"]
-                        }
-                    ]
-                },
-                "Question 3": {
-                    rich_text: [
-                        {
-                            text: brackets["open"]
-                        },
-                        {
-                            text: {
-                                content: templText[3]
-                            },
-                            annotations: question["annotations"]
-                        },
-                        {
-                            text: brackets["closed"]
-                        }                      
-                    ]
-                },
-                "Question 4": {
-                    rich_text: [
-                        {
-                            text: brackets["open"]
-                        },
-                        {
-                            text: {
-                                content: templText[4]
-                            },
-                            annotations: question["annotations"]
-                        },
-                        {
-                            text: brackets["closed"]
-                        }
-                    ]
+                        annotations: question["annotations"]
+                    },
+                    {
+                        text: brackets["closed"]
+                    }
+                ]
+            }
+        }
+    });
+    const responseResults = {
+        object: response.object,
+        // ISO 8601 time -> Date object -> String
+        created_time: new Date(response.created_time).toString('en', {timezone: 'EST'}),
+        parent: response.parent,
+        properties: response.properties
+    };
+    console.log("updateTemplate()", responseResults);
+    return responseResults;
+};
+
+/**
+ * Collects user activity on project page
+ * @param {string} projIntgr - associated project integration token
+ * @param {string} projId - project page id
+ * @return {json} - all relevant page info
+ */
+const getProject = async (projIntgr, projId) => {
+    // 12 element json
+    const response = await projIntgr.pages.retrieve({ page_id: projId });
+    // 4 relevant elements
+    const responseResults = {
+        pg_name: response.properties.title.title[0].plain_text,
+        // ISO 8601 time -> Date object -> String
+        pg_init_time: new Date(response.created_time).toString('en', {timezone: 'EST'}),
+        pg_last_edit_time: new Date(response.last_edited_time).toString('en', {timezone: 'EST'})
+    };
+    console.log("getProject()", responseResults);
+    return responseResults;
+};
+
+/**
+ * Adds a new comment to project page
+ * @param {string} projIntgr - associated project integration token
+ * @param {string} projId - project page id
+ * @param {string} feedback - comment text
+ * @return {json} - all relevant page info
+ */
+const msgProject = async (projIntgr, projId, feedback) => {
+    const response = await projIntgr.comments.create({
+        parent: {
+            "page_id": projId
+        },
+        rich_text: [
+            {
+                "text": {
+                "content": feedback
                 }
             }
-        });
-        console.log("updateTemplate()", response);
-    }
-    catch(error) {
-        console.log("updateTemplate()", error);
-    }
+        ]
+    });
+    const responseResults = {
+        object: response.object,
+        // ISO 8601 time -> Date object -> String
+        created_time: new Date(response.created_time).toString('en', {timezone: 'EST'}),
+        content: response.rich_text[0].plain_text
+    };
+    console.log("msgProject()", responseResults);
+    return responseResults;
 };
+
+//                               CONSTANTS
+// Access template page
+const templateIntgr = new Client({ auth : notion_info.template.tokens.intgr_token});
+const templateId = notion_info.template.tokens.page_token;
+// Access project page
+const projIntgr = new Client({ auth : notion_info.project.tokens.intgr_token});
+const projId = notion_info.project.tokens.page_token;
 // All 4 curated Notion template questions
 const positivity=["1",
                   "What is 1 thing you are grateful for today?",
@@ -158,51 +217,24 @@ const notion_templates= {
     task_log: task_log,
     goal_set: goal_set
 }
-updateTemplate(templateIntgr,templateId,notion_templates["goal_set"]);
-
-
-// Collects user activity on project space
-const getProject = async (projIntgr, projId) => {
-    try 
-    {
-        // 12 element json
-        const response = await projIntgr.pages.retrieve({ page_id: projId });
-        // 4 relevant elements
-        const responseResults = {
-            pg_name: response.properties.title.title[0].plain_text,
-            // ISO 8601 time -> Date object -> String
-            pg_init_time: new Date(response.created_time).toString('en', {timezone: 'EST'}),
-            pg_last_edit_time: new Date(response.last_edited_time).toString('en', {timezone: 'EST'})
-        };
-        console.log("getProject()", responseResults);
-    }
-    catch(error) {
-        console.log("getProject()", error);
-    }
-};
-// getProject(projIntgr,projId);
-
-// Adds a new comment to project space
-const msgProject = async (projIntgr, projId, feedback) => {
-    try {
-        const response = await projIntgr.comments.create({
-            parent: {
-                "page_id": projId
-            },
-            rich_text: [
-                {
-                    "text": {
-                    "content": feedback
-                    }
-                }
-            ]
-        });
-        console.log("msgProject()", response);
-    }
-    catch(error)
-    {
-        console.log("msgProject()", error);
-    }
-};
+// Example feedback for Notion project page
 let comment = "You're doing great! Keep it up."
-// msgProject(projIntgr,projId,comment);
+
+// Run all function calls and catch any errors
+try {
+    getTemplate(templateIntgr,templateId);
+    updateTemplate(templateIntgr,templateId,notion_templates["goal_set"]);
+    getProject(projIntgr,projId);
+    msgProject(projIntgr,projId,comment);
+}
+catch(error) {
+    console.log(error);
+}
+
+// Export functions to run in feedback_cron.js
+module.exports= {
+    getTemplate: getTemplate,
+    updateTemplate: updateTemplate,
+    getProject: getProject,
+    msgProject: msgProject
+}

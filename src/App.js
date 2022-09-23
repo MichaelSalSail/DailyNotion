@@ -19,9 +19,7 @@ const App = () => {
   // If false, display Login.jsx
   const [user, setUser] = useState('');
 
-  // if false, display Onboarding.jsx
-  const [hasOnboarded, setOnboard] = useState(false);
-
+  const [currUser, setCurrUser] = useState('');
   // 5 of the 10 parameters required for the Login function
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,6 +40,8 @@ const App = () => {
   // Check if user input matches credentials stored in firebase.
   // If so, go to the Home page (Main.jsx)
   const handleLogin= () =>{
+    setCurrUser(fireDB.getUserID(email))
+    //console.log("handleLogin: " +currUser)
     clearError();
       signInWithEmailAndPassword(auth,email,password)
       .catch(err => {
@@ -57,8 +57,10 @@ const App = () => {
         }
       });
       //console.log(fireDB.checkOnboarded("example"))
-      console.log(fireDB.getUserID(email))
-      setOnboard(fireDB.checkOnboarded("example")) 
+      
+      //console.log(fireDB.checkOnboarded(currUser))
+      
+      //setOnboard(fireDB.checkOnboarded(currUser)) 
   };
 
   // Prevents the user from signing up for 3 cases.
@@ -109,12 +111,46 @@ const App = () => {
     <div className="App">
       {/* In my other project, my team created a 'routes.js' to clearly label all web app links
           then imported the file to App.js. I'll do that eventually so it looks neater.
-          
-          { user ? (onboarding ? (<Router></Router>):(<Router></Router>)):(<Router></Router>)
           */}
       
+          
+      {user ? ( // if user is true
+        fireDB.checkOnboarded(fireDB.debug(currUser)) ? ( // if onboarded
+        <Router>
+          <Routes>
+          <Route exact path="/" 
+                   element={<Main handleLogout={handleLogout} user={user} email={email}/>}/>
+          </Routes>
+        </Router> 
+        ) : ( // if not onboarded
+        <Router>
+          <Routes>
+          <Route exact path="/" element={<Navigate to="/onboarding"/>}/>  
+          <Route exact path="/onboarding" 
+                   element={<Onboarding handleLogout={handleLogout} user={user} email={email}/>}/>
+          </Routes>
+        </Router>) 
+        ) : ( // if user is false 
+        <Router>
+          <Routes>
+            <Route exact path="/"
+                   element={<Login 
+                   email = {email} 
+                   setEmail = {setEmail} 
+                   password = {password}
+                   setPassword = {setPassword}
+                   handleLogin = {handleLogin}
+                   handleSignup = {handleSignup}
+                   hasAccount = {hasAccount}
+                   setHasAccount ={setHasAccount}
+                   emailError = {emailError}
+                   passwordError = {passwordError}/>}/>
+          </Routes>
+        </Router>
 
-      
+      )}
+
+{/*         
       {user ? (
         <Router>
           <Routes>
@@ -143,7 +179,7 @@ const App = () => {
           </Routes>
         </Router>
       )}
-
+ */}
 
     
 

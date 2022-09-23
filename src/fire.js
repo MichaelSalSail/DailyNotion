@@ -52,11 +52,19 @@ function getUserID(user_email){
   return user_id
 }
 
+function debug(str){
+  console.log("DEBUG: " + str)
+  return  str
+}
 
 // GET check if user_ID has completed onboarding (check for non-empty que and ans) // if ANY is empty, return false
 function checkOnboarded(user_id){
+  console.log("fire.js: " + user_id)
   const db = getDatabase();
   let res = false
+  if (!user_id) {
+    return false
+  }
   onValue(ref(db), (snapshot) => {
       for(let i = 1; i < 7; i++){
         if (!snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)] || snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)].length == 0 ) {
@@ -266,7 +274,8 @@ let fireDB = {
   user_skeleton: user_skeleton,
   set_new_user: set_new_user,
   checkOnboarded: checkOnboarded,
-  getUserID: getUserID
+  getUserID: getUserID,
+  debug: debug
 };
 
 export default fireDB;

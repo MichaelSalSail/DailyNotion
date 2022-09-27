@@ -40,7 +40,7 @@ const nodeRecent = (dateObj = new Date()) => {
 // console.log(nodeRecent());
 // console.log(nodeRecent(new Date('January 1, 2023 03:24:00')));
 
-// Export functions to run in feedback_cron.js
+// Export functions for use in msg_triggers.js
 module.exports= {
     nodeDate: nodeDate,
     nodeRecent: nodeRecent

@@ -1,5 +1,5 @@
 // const notionAPI = require('./notionAPI.js');
-const utils = require('utils.js');
+const triggers = require('./msg_triggers.js');
 
 // GET Firebase Realtime code goes here
 
@@ -15,11 +15,18 @@ let example_user= {
     "users": {
       "example": {
         "daily_mood": {
-          "date_09_22_2022": 1
+          "date_09_19_2022": 1,
+          "date_09_20_2022": 3,
+          "date_09_21_2022": 1,
+          "date_09_22_2022": 1,
+          "date_09_23_2022": 3,
+          "date_09_24_2022": 5,
+          "date_09_25_2022": 5,
+          "date_09_26_2022": 5
         },
         "project": {
           "api_resp": {
-            "date_09_23_2022": {
+            "date_09_26_2022": {
                 "getProject": { 
                     pg_name: 'Example Project', 
                     pg_init_time: 'Thu Jul 07 2022 14:16:00 GMT-0400 (Eastern Daylight Time)', 
@@ -65,7 +72,7 @@ let example_user= {
         },
         "template": {
           "api_resp": {
-            "date_09_23_2022": {
+            "date_09_26_2022": {
                 "getTemplate": {
                     db_name: 'Database Example for DailyNotion', 
                     db_init_time: 'Tue Aug 02 2022 21:21:00 GMT-0400 (Eastern Daylight Time)', 
@@ -104,25 +111,43 @@ let example_user= {
       }
     }
 }
-for(prop in example_user.users.example)
-    console.log(prop);
+/*for(prop in example_user.users.example)
+    console.log(prop);*/
 
 // TRIGGERS
-                    // GENERAL
-// 1. A week passed and you didn't write to template.
-// 2. A week passed and didn't write to project page.
-// 3. Tracked mood for 7 days in a row.
-// 4. Mood is happy for 3 days in a row.
+                    // CONSTANTS
+const msgs=["Please remember to fill out your template! It's important to help overcome your unique productivity hurdles.",
+            "You haven't done anything this past week! Fill out the template for this week to reassess what went wrong.",
+            "You're frequently tracking your mood. Excellent work!",
+            "Recently, you've been feeling great! Use this to your advantage, get work done!",
+            "You were productive during an off day! Great work.",
+            "You haven't worked for an on day. Try and stick to those days.",
+            "You worked all of last week! Try and schedule at least 1 day a week to no work.",
+            "Even through poor mood you're productive. Impressive!",
+            "Go easy on yourself! Don't focus too much on work.",
+            "You were productive for most of last week. You show consistant effort!"];
+const feedback=[];
+const get_templ= {
+  db_name: 'Database Example for DailyNotion',
+  db_init_time: 'Tue Aug 02 2022 21:21:00 GMT-0400 (Eastern Daylight Time)',
+  db_last_edit_time: 'Tue Sep 20 2022 23:44:00 GMT-0400 (Eastern Daylight Time)'
+}
+const get_proj= {
+  pg_name: 'Example Project',
+  pg_init_time: 'Thu Jul 07 2022 14:16:00 GMT-0400 (Eastern Daylight Time)',
+  pg_last_edit_time: 'Tue Sep 20 2022 21:37:00 GMT-0400 (Eastern Daylight Time)'
+};
 
-                    // SPECIFIC
-// Overwork (burnout)
-// 1. Worked 7 days last week.
+// General trigger function results
+const general_triggers=[triggers.templ_inactive_week(get_templ),
+                        triggers.proj_inactive_week(get_proj),
+                        triggers.mood_streak7(example_user.users.example),
+                        triggers.mood_h_streak3(example_user.users.example)];
 
-// Procrastination
-// 1. Worked during a day you tend to be less productive.
-// 2. Didn't work for a day you tend to be productive.
-
-// Excessive Negative Thinking
-// 1. Mood is not happy for 3 days in a row but also productive.
-// 2. Mood is not happy for 3 days in a row but also unproductive.
-// 3. A majority of days last week the user was productive.
+// Associated msgs
+for(i=0;i<general_triggers.length;i++)
+{
+  if(general_triggers[i]===true)
+    feedback.push(msgs[i]);
+}
+console.log(feedback);

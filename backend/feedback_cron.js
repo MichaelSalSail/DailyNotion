@@ -20,9 +20,10 @@ let example_user= {
           "date_09_21_2022": 1,
           "date_09_22_2022": 1,
           "date_09_23_2022": 3,
-          "date_09_24_2022": 5,
-          "date_09_25_2022": 5,
-          "date_09_26_2022": 5
+          "date_09_24_2022": 2,
+          "date_09_25_2022": 4,
+          "date_09_26_2022": 5,
+          "date_09_27_2022": 5
         },
         "project": {
           "api_resp": {
@@ -120,10 +121,10 @@ const msgs=["Please remember to fill out your template! It's important to help o
             "You haven't done anything this past week! Fill out the template for this week to reassess what went wrong.",
             "You're frequently tracking your mood. Excellent work!",
             "Recently, you've been feeling great! Use this to your advantage, get work done!",
-            "You were productive during an off day! Great work.",
+/*overwork*/"You worked all of last week! Try and schedule at least 1 day a week to no work.",
+/*procrast*/"You were productive during an off day! Great work.",
             "You haven't worked for an on day. Try and stick to those days.",
-            "You worked all of last week! Try and schedule at least 1 day a week to no work.",
-            "Even through poor mood you're productive. Impressive!",
+/*negative*/"Even through poor mood you're productive. Impressive!",
             "Go easy on yourself! Don't focus too much on work.",
             "You were productive for most of last week. You show consistant effort!"];
 const feedback=[];
@@ -131,18 +132,68 @@ const get_templ= {
   db_name: 'Database Example for DailyNotion',
   db_init_time: 'Tue Aug 02 2022 21:21:00 GMT-0400 (Eastern Daylight Time)',
   db_last_edit_time: 'Tue Sep 20 2022 23:44:00 GMT-0400 (Eastern Daylight Time)'
-}
+};
 const get_proj= {
   pg_name: 'Example Project',
   pg_init_time: 'Thu Jul 07 2022 14:16:00 GMT-0400 (Eastern Daylight Time)',
   pg_last_edit_time: 'Tue Sep 20 2022 21:37:00 GMT-0400 (Eastern Daylight Time)'
 };
 
+const ow_test= {
+  "project": {
+    "api_resp": {
+      "date_09_21_2022": {
+        "getProject": {pg_last_edit_time:'Tue Sep 21 2022 21:37:00 GMT-0400 (Eastern Daylight Time)'}
+      },
+      "date_09_22_2022": {
+        "getProject": {pg_last_edit_time:'Tue Sep 22 2022 21:37:00 GMT-0400 (Eastern Daylight Time)'}
+      },
+      "date_09_23_2022": {
+        "getProject": {pg_last_edit_time:'Tue Sep 23 2022 21:37:00 GMT-0400 (Eastern Daylight Time)'}
+      },
+      "date_09_24_2022": {
+        "getProject": {pg_last_edit_time:'Tue Sep 24 2022 21:37:00 GMT-0400 (Eastern Daylight Time)'}
+      },
+      "date_09_25_2022": {
+        "getProject": {pg_last_edit_time:'Tue Sep 25 2022 21:37:00 GMT-0400 (Eastern Daylight Time)'}
+      },
+      "date_09_26_2022": {
+        "getProject": {pg_last_edit_time:'Tue Sep 26 2022 21:37:00 GMT-0400 (Eastern Daylight Time)'}
+      },
+      "date_09_27_2022": {
+          "getProject": {pg_last_edit_time:'Tue Sep 27 2022 21:37:00 GMT-0400 (Eastern Daylight Time)'}
+      }
+    }
+  },
+  "ques_respon": {
+    "answ_1": "Overwork (burnout)",
+    "answ_2": "Great",
+    "answ_3": [
+      "Mon",
+      "Wed",
+      "Fri"
+    ],
+    "answ_4": [
+      "Early Afternoon (12PM-3PM)",
+      "Early Evening (6PM-9PM)"
+    ],
+    "answ_5": [
+      "Sun",
+      "Sat"
+    ],
+    "answ_6": [
+      "Early Morning (6AM-9AM)",
+      "Night (12AM-5AM)"
+    ]
+  }
+};
+
 // General trigger function results
 const general_triggers=[triggers.templ_inactive_week(get_templ),
                         triggers.proj_inactive_week(get_proj),
                         triggers.mood_streak7(example_user.users.example),
-                        triggers.mood_h_streak3(example_user.users.example)];
+                        triggers.mood_h_streak3(example_user.users.example),
+                        triggers.burnout7(ow_test)];
 
 // Associated msgs
 for(i=0;i<general_triggers.length;i++)

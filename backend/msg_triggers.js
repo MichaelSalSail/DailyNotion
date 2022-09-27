@@ -107,21 +107,61 @@ const mood_h_streak3 = (user_tree) => {
 
 //                                          SPECIFIC
 // Overwork (burnout)
-// 1. Worked 7 days last week.
+// 5. Worked 7 days last week.
+const burnout7 = (user_tree) => {
+    // this function is only for overwork users!
+    if(user_tree.ques_respon.answ_1!=="Overwork (burnout)")
+    {
+        console.log("5. burnout7 is", false, "since wrong user-type");
+        return false;
+    }
+    else
+    {
+        let node_day_b4=utils.nodeDate();
+        let day_b4=new Date();
+        for(let i=7;i>0;i--)
+        {
+            if(user_tree.project.api_resp[node_day_b4] === undefined)
+            {
+                console.log("5. burnout7 is", false, "since", node_day_b4);
+                return false;
+            }
+            else
+            {
+                let edit_date=new Date(user_tree.project.api_resp[node_day_b4].getProject.pg_last_edit_time);
+                if(day_b4.getFullYear()!==edit_date.getFullYear() || 
+                   day_b4.getMonth()!==edit_date.getMonth() ||
+                   day_b4.getDate()!==edit_date.getDate())
+                {
+                    console.log("5. burnout7 is", false, "since", node_day_b4);
+                    return false;
+                }
+            }
+            // create a date object that goes back one day
+            day_b4.setDate(day_b4.getDate() - 1);
+            // store the equivalent node name
+            node_day_b4=utils.nodeDate(day_b4);
+        }
+        // if there exists date_nodes AND the last_edit_times match the current day
+        console.log("5. burnout7 is", true, "since", node_day_b4);
+        return true;
+    }
+}
 
 // Procrastination
-// 1. Worked during a day you tend to be less productive.
-// 2. Didn't work for a day you tend to be productive.
+// 6. Worked during a day you tend to be less productive.
+// 7. Didn't work for a day you tend to be productive.
 
 // Excessive Negative Thinking
-// 1. Mood is not happy for 3 days in a row but also productive.
-// 2. Mood is not happy for 3 days in a row but also unproductive.
-// 3. A majority of days last week the user was productive.
+// 8. Mood is not happy for 3 days in a row but also productive.
+// 9. Mood is not happy for 3 days in a row but also unproductive.
+// 10. A majority of days last week the user was productive.
 
 // Export functions for use in feedback_cron.js
 module.exports= {
     templ_inactive_week: templ_inactive_week,
     proj_inactive_week: proj_inactive_week,
     mood_streak7: mood_streak7,
-    mood_h_streak3: mood_h_streak3
+    mood_h_streak3: mood_h_streak3,
+    burnout7: burnout7
 }

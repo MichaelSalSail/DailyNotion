@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import {initializeApp} from 'firebase/app'
-import {getDatabase, ref, onValue, set, child, get} from 'firebase/database';
+import {getDatabase, ref, onValue, set, update, push, child, get} from 'firebase/database';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -48,6 +48,7 @@ function writeUserInfo(user_info) {
   }
 }
 
+
 // CONVERT user_email to user_id
 function getUserID(user_email){
   let reg_exp=/[@.]/g;
@@ -61,44 +62,64 @@ function debug(str){
   return  str
 }
 
+
 // POST daily check in submission
 function WriteDailyCheckIn( date, mood){
-  //const db = getDatabase();
+  const db = getDatabase();
+
   date = date.toLocaleDateString()
   date = date.replaceAll('/', '_')
   date = "date_" + date
 
-  console.log(userIDRef, date, mood)
-  
-  /*
-    onValue(ref(db), (snapshot) => {
-      snapshot.val()["users"][user_id]["daily_mood"]
+  const newKey = push(child(ref(db, 'users/' + userIDRef ), 'daily_mood')).key; // do not remove: need to force create a new entry, then overwrite key below
+  const updates = {};
+  updates[date] = mood;
+
+  update(ref(db, 'users/' + userIDRef + '/daily_mood' ), updates)
+  .then(() => {
+    // Data saved successfully!
+    console.log('SUCCESS')
   })
-  */
+  .catch((error) => {
+    // The write failed...
+    console.log(error)
+  });
+
 }
 
+
+let cache = new Set()
 // GET check if user_ID has completed onboarding (check for non-empty que and ans) // if ANY is empty, return false
 function checkOnboarded(user_id){
   //console.log("fire.js: " + user_id)
+  
   userIDRef = user_id
-  const db = getDatabase();
-  let res = false
+  
   if (!user_id) {
     return false
   }
+
+  if (cache.has(user_id)) {
+    return true
+  } 
+
+  const db = getDatabase();
+  let res = false
+ 
   onValue(ref(db), (snapshot) => {
       for(let i = 1; i < 7; i++){
+        console.log(user_id)
         if (!snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)] || snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)].length == 0 ) {
             //console.log("false!!" + snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)].length);
             break;
         } else {
+          cache.add(user_id)
           res = true // only returns true if every ans is non-empty
         }
       }
       
   })
   return res
-  // !String(i) || String(i).length == 0
 }
 
 
@@ -266,10 +287,9 @@ let example_all={
   }
 }
 writeUserInfo(example_all);
-
 // user "example" is a dummy example
-read_que_ans("example");
-checkOnboarded("example");
+//read_que_ans("example");
+//checkOnboarded("example");
 // make a blank template for new users
 let user_skeleton= {
   example: {
@@ -289,6 +309,9 @@ let user_skeleton= {
     }
   }
 }
+
+
+writeUserInfo(user_skeleton)
 
 let fireDB = {
   fire_app: fire_app,

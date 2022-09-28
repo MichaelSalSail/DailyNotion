@@ -126,7 +126,7 @@ const App = () => {
         <Router>
           <Routes>
           <Route exact path="/" 
-                   element={<Main handleLogout={handleLogout} user={user} email={email}/>}/>
+                   element={<Navigate to="/onboarding"/>}/>
           <Route exact path="/onboarding" 
                    element={<Onboarding handleLogout={handleLogout} user={user} email={email}/>}/>
           </Routes>

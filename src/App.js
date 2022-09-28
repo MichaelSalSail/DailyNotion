@@ -122,10 +122,11 @@ const App = () => {
                    element={<Main handleLogout={handleLogout} user={user} email={email}/>}/>
           </Routes>
         </Router> 
-        ) : ( // if not onboarded
+        ) : ( // if not onboarded <Route exact path="/" element={<Navigate to="/onboarding"/>}/>  
         <Router>
           <Routes>
-          <Route exact path="/" element={<Navigate to="/onboarding"/>}/>  
+          <Route exact path="/" 
+                   element={<Main handleLogout={handleLogout} user={user} email={email}/>}/>
           <Route exact path="/onboarding" 
                    element={<Onboarding handleLogout={handleLogout} user={user} email={email}/>}/>
           </Routes>

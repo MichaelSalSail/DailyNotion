@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom'
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
 
-import MaterialUIPickers from './datepicker.jsx'
-import RadioGroupRating from './ratings.jsx'
+import DailyCheckIn from './dailycheckin.jsx'
 
 // For Tabs
 import PropTypes from 'prop-types';
@@ -75,12 +74,7 @@ function TabPanel(props) {
 
                 <div class="row">
                 <div class="column"> 
-                    <MaterialUIPickers></MaterialUIPickers>
-                    <br></br> 
-                    <h2> How are you doing? </h2>
-                    <RadioGroupRating></RadioGroupRating>   
-
-                    <Button variant="contained"> Submit </Button>
+                    <DailyCheckIn></DailyCheckIn>
                 </div>
                 <div class="column">
                     <h2> Welcome to Daily Check-In!</h2>

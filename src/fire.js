@@ -21,6 +21,9 @@ const firebaseConfig = {
 // Initialize Firebase
 const fire_app = initializeApp(firebaseConfig);
 
+// Reference value for user
+let userIDRef = ''
+
 // POST references under 'references' node on Firebase Realtime
 function writeRefrnces(refr_info) {
   const db = getDatabase();
@@ -49,6 +52,7 @@ function writeUserInfo(user_info) {
 function getUserID(user_email){
   let reg_exp=/[@.]/g;
   const user_id=user_email.replaceAll(reg_exp,"_");
+  userIDRef = user_id
   return user_id
 }
 
@@ -57,9 +61,17 @@ function debug(str){
   return  str
 }
 
+// POST daily check in submission
+function WriteDailyCheckIn( date, mood){
+  //const db = getDatabase();
+  console.log(userIDRef, date, mood)
+  //onValue(ref(db),)
+}
+
 // GET check if user_ID has completed onboarding (check for non-empty que and ans) // if ANY is empty, return false
 function checkOnboarded(user_id){
-  console.log("fire.js: " + user_id)
+  //console.log("fire.js: " + user_id)
+  userIDRef = user_id
   const db = getDatabase();
   let res = false
   if (!user_id) {
@@ -275,7 +287,8 @@ let fireDB = {
   set_new_user: set_new_user,
   checkOnboarded: checkOnboarded,
   getUserID: getUserID,
-  debug: debug
+  debug: debug,
+  WriteDailyCheckIn: WriteDailyCheckIn
 };
 
 export default fireDB;

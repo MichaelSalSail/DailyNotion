@@ -34,8 +34,8 @@ const templ_inactive_week = (get_templ) => {
  */
 const proj_inactive_week = (get_proj) => {
     const today = new Date();
-    last_edit=get_proj.pg_last_edit_time;
-    date_edit=new Date(last_edit);
+    let last_edit=get_proj.pg_last_edit_time;
+    let date_edit=new Date(last_edit);
     if(Math.abs(Date.parse(date_edit)-Date.parse(today))>=604800000)
     {
         console.log("2. Difference is in range:",Math.abs(Date.parse(date_edit)-Date.parse(today)));
@@ -112,7 +112,7 @@ const burnout7 = (user_tree) => {
     // this function is only for overwork users!
     if(user_tree.ques_respon.answ_1!=="Overwork (burnout)")
     {
-        console.log("5. burnout7 is", false, "since wrong user-type");
+        console.log("5. burnout7 is", false, "b/c user is not overwork.");
         return false;
     }
     else
@@ -150,11 +150,115 @@ const burnout7 = (user_tree) => {
 
 // Procrastination
 // 6. Worked during a day you tend to be less productive.
+const workedOffDay = (user_tree) => {
+    // this function is only for procrastination users!
+    if(user_tree.ques_respon.answ_1!=="Procrastination")
+    {
+        console.log("6. workedOffDay is", false, "b/c user is not procrastination.");
+        return false;
+    }
+    else
+    {
+        // ques_3: Which days of the week are you most productive? (max. 3)
+        // ques_5: Which days of the week are you least productive? (max. 3)
+        let on_days=user_tree.ques_respon.answ_3;
+        let off_days=user_tree.ques_respon.answ_5;
+        // Not sure if user answers from Firebase Realtime will be strings or numbers.
+        // Either way, here's how to read it. Each index is day of week except index 0.
+        const equivalent= ["N/A","Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+        // convert from numbers to equivalent string
+        if(typeof(on_days[0])==='number')
+        {
+            for(let i=0;i<on_days.length;i++)
+                on_days[i]=equivalent[on_days[i]];
+        }
+        if(typeof(off_days[0])==='number')
+        {
+            for(let i=0;i<off_days.length;i++)
+                off_days[i]=equivalent[off_days[i]];
+        }
+        // Did the user put in similar days for opposite questions?
+        // If so, we have to ignore those inputs.
+        const upd_days=utils.rmve_overlap(on_days,off_days);
+        on_days=upd_days[0];
+        off_days=upd_days[1];
+        // get the day of week for recent last_edit
+        const today = new Date();
+        let last_edit=user_tree.project.api_resp[utils.nodeDate()].getProject.pg_last_edit_time;
+        let date_edit=new Date(last_edit);
+        let day_of_edit=equivalent[date_edit.getDay()+1];
+        // if there was an edit today and the day_of_edit was in off_days, return true
+        if(today.getFullYear()===date_edit.getFullYear() && today.getMonth()===date_edit.getMonth() &&
+            today.getDate()===date_edit.getDate())
+        {
+            if(off_days.includes(day_of_edit))
+            {
+                console.log("6. workedOffDay is", true);
+                return true;
+            }
+        }
+        console.log("6. workedOffDay is", false);
+        return false;
+    }
+};
+
+// Procrastination
 // 7. Didn't work for a day you tend to be productive.
+const noworkOnDay = (user_tree) => {
+    // this function is only for procrastination users!
+    if(user_tree.ques_respon.answ_1!=="Procrastination")
+    {
+        console.log("7. noworkOnDay is", false, "b/c user is not procrastination.");
+        return false;
+    }
+    else
+    {
+        let on_days=user_tree.ques_respon.answ_3;
+        let off_days=user_tree.ques_respon.answ_5;
+        const equivalent= ["N/A","Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+        // convert from numbers to equivalent string
+        if(typeof(on_days[0])==='number')
+        {
+            for(let i=0;i<on_days.length;i++)
+                on_days[i]=equivalent[on_days[i]];
+        }
+        if(typeof(off_days[0])==='number')
+        {
+            for(let i=0;i<off_days.length;i++)
+                off_days[i]=equivalent[off_days[i]];
+        }
+        // Did the user put in similar days for opposite questions?
+        // If so, we have to ignore those inputs.
+        const upd_days=utils.rmve_overlap(on_days,off_days);
+        on_days=upd_days[0];
+        off_days=upd_days[1];
+        // get the day of week for recent last_edit
+        const today = new Date();
+        let last_edit=user_tree.project.api_resp[utils.nodeDate()].getProject.pg_last_edit_time;
+        let date_edit=new Date(last_edit);
+        let day_of_2day=equivalent[today.getDay()+1];
+        // if there was NOT an edit today and the day of week for today is in on_days, return true
+        if(today.getFullYear()!==date_edit.getFullYear() || today.getMonth()!==date_edit.getMonth() ||
+            today.getDate()!==date_edit.getDate())
+        {
+            if(on_days.includes(day_of_2day))
+            {
+                console.log("7. noworkOnDay is", true);
+                return true;
+            }
+        }
+        console.log("7. noworkOnDay is", false);
+        return false;
+    }
+};
 
 // Excessive Negative Thinking
 // 8. Mood is not happy for 3 days in a row but also productive.
+
+// Excessive Negative Thinking
 // 9. Mood is not happy for 3 days in a row but also unproductive.
+
+// Excessive Negative Thinking
 // 10. A majority of days last week the user was productive.
 
 // Export functions for use in feedback_cron.js
@@ -163,5 +267,7 @@ module.exports= {
     proj_inactive_week: proj_inactive_week,
     mood_streak7: mood_streak7,
     mood_h_streak3: mood_h_streak3,
-    burnout7: burnout7
+    burnout7: burnout7,
+    workedOffDay: workedOffDay,
+    noworkOnDay: noworkOnDay
 }

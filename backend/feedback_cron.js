@@ -64,6 +64,7 @@ let example_user= {
           ],
           "answ_5": [
             "Sun",
+            "Tue",
             "Sat"
           ],
           "answ_6": [
@@ -188,12 +189,50 @@ const ow_test= {
   }
 };
 
+const proc_test= {
+  "project": {
+    "api_resp": {
+      "date_09_26_2022": {
+        "getProject": {pg_last_edit_time:'Mon Sep 26 2022 21:37:00 GMT-0400 (Eastern Daylight Time)'}
+      },
+      "date_09_27_2022": {
+          "getProject": {pg_last_edit_time:'Tue Sep 27 2022 21:37:00 GMT-0400 (Eastern Daylight Time)'}
+      }
+    }
+  },
+  "ques_respon": {
+    "answ_1": "Procrastination",
+    "answ_2": "Great",
+    "answ_3": [
+      "Mon",
+      "Wed",
+      //"Tue",
+      "Fri"
+    ],
+    "answ_4": [
+      "Early Afternoon (12PM-3PM)",
+      "Early Evening (6PM-9PM)"
+    ],
+    "answ_5": [
+      "Sun",
+      "Tue",
+      "Sat"
+    ],
+    "answ_6": [
+      "Early Morning (6AM-9AM)",
+      "Night (12AM-5AM)"
+    ]
+  }
+};
+
 // General trigger function results
 const general_triggers=[triggers.templ_inactive_week(get_templ),
                         triggers.proj_inactive_week(get_proj),
                         triggers.mood_streak7(example_user.users.example),
                         triggers.mood_h_streak3(example_user.users.example),
-                        triggers.burnout7(ow_test)];
+                        triggers.burnout7(ow_test),
+                        triggers.workedOffDay(proc_test),
+                        triggers.noworkOnDay(proc_test)];
 
 // Associated msgs
 for(i=0;i<general_triggers.length;i++)

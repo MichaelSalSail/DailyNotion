@@ -64,8 +64,17 @@ function debug(str){
 // POST daily check in submission
 function WriteDailyCheckIn( date, mood){
   //const db = getDatabase();
+  date = date.toLocaleDateString()
+  date = date.replaceAll('/', '_')
+  date = "date_" + date
+
   console.log(userIDRef, date, mood)
-  //onValue(ref(db),)
+  
+  /*
+    onValue(ref(db), (snapshot) => {
+      snapshot.val()["users"][user_id]["daily_mood"]
+  })
+  */
 }
 
 // GET check if user_ID has completed onboarding (check for non-empty que and ans) // if ANY is empty, return false

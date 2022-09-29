@@ -254,12 +254,153 @@ const noworkOnDay = (user_tree) => {
 
 // Excessive Negative Thinking
 // 8. Mood is not happy for 3 days in a row but also productive.
+const lowmood3_pro = (user_tree) => {
+    // this function is only for excessive negative thinking users!
+    if(user_tree.ques_respon.answ_1!=="Excessive Negative Thinking")
+    {
+        console.log("8. lowmood3_pro is", false, "b/c user is not negative thinking.");
+        return false;
+    }
+    else
+    {
+        let node_day_b4=utils.nodeDate();
+        let day_b4=new Date();
+        // keep track of number of productive days in streak
+        let pro_days=0;
+        for(let i=3;i>0;i--)
+        {
+            // If the mood value is happy, 4 or 5, the streak is broken.
+            if(user_tree.daily_mood[node_day_b4] === undefined || user_tree.daily_mood[node_day_b4] > 3)
+            {
+                console.log("8. lowmood3_pro is", false, "since", node_day_b4);
+                return false;
+            }
+            else
+            {
+                let last_edit=user_tree.project.api_resp[node_day_b4].getProject.pg_last_edit_time;
+                let date_edit=new Date(last_edit);
+                if(day_b4.getFullYear()===date_edit.getFullYear() && day_b4.getMonth()===date_edit.getMonth() &&
+                day_b4.getDate()===date_edit.getDate())
+                {
+                    if(user_tree.daily_mood[node_day_b4] <= 3)
+                        pro_days++;
+                }
+                // create a date object that goes back one day
+                day_b4.setDate(day_b4.getDate() - 1);
+                // store the equivalent node name
+                node_day_b4=utils.nodeDate(day_b4);
+            }
+        }
+        if(pro_days>=2)
+        {
+            console.log("8. lowmood3_pro is", true, "since", node_day_b4);
+            return true;
+        }
+        else
+        {
+            console.log("8. lowmood3_pro is", false, "since", node_day_b4);
+            return false;
+        }
+    }
+};
 
 // Excessive Negative Thinking
 // 9. Mood is not happy for 3 days in a row but also unproductive.
+const lowmood3_nopro = (user_tree) => {
+    // this function is only for excessive negative thinking users!
+    if(user_tree.ques_respon.answ_1!=="Excessive Negative Thinking")
+    {
+        console.log("9. lowmood3_nopro is", false, "b/c user is not negative thinking.");
+        return false;
+    }
+    else
+    {
+        let node_day_b4=utils.nodeDate();
+        let day_b4=new Date();
+        // keep track of number of productive days in streak
+        let pro_days=0;
+        for(let i=3;i>0;i--)
+        {
+            // If the mood value is happy, 4 or 5, the streak is broken.
+            if(user_tree.daily_mood[node_day_b4] === undefined || user_tree.daily_mood[node_day_b4] > 3)
+            {
+                console.log("9. lowmood3_nopro is", false, "since", node_day_b4);
+                return false;
+            }
+            else
+            {
+                let last_edit=user_tree.project.api_resp[node_day_b4].getProject.pg_last_edit_time;
+                let date_edit=new Date(last_edit);
+                if(day_b4.getFullYear()===date_edit.getFullYear() && day_b4.getMonth()===date_edit.getMonth() &&
+                day_b4.getDate()===date_edit.getDate())
+                {
+                    if(user_tree.daily_mood[node_day_b4] <= 3)
+                        pro_days++;
+                }
+                day_b4.setDate(day_b4.getDate() - 1);
+                node_day_b4=utils.nodeDate(day_b4);
+            }
+        }
+        if(pro_days<=1)
+        {
+            console.log("9. lowmood3_nopro is", true, "since", node_day_b4);
+            return true;
+        }
+        else
+        {
+            console.log("9. lowmood3_nopro is", false, "since", node_day_b4);
+            return false;
+        }
+    }
+};
 
 // Excessive Negative Thinking
 // 10. A majority of days last week the user was productive.
+const cnstnt_prod = (user_tree) => {
+    // this function is only for excessive negative thinking users!
+    if(user_tree.ques_respon.answ_1!=="Excessive Negative Thinking")
+    {
+        console.log("10. cnstnt_prod is", false, "b/c user is not negative thinking.");
+        return false;
+    }
+    else
+    {
+        let node_day_b4=utils.nodeDate();
+        let day_b4=new Date();
+        // keep track of number of productive days
+        let prod_count=0;
+        for(let i=7;i>0;i--)
+        {
+            if(user_tree.project.api_resp[node_day_b4] === undefined)
+            {
+                console.log("10. cnstnt_prod is", false, "since", node_day_b4);
+                return false;
+            }
+            else
+            {
+                let date_edit=new Date(user_tree.project.api_resp[node_day_b4].getProject.pg_last_edit_time);
+                if(day_b4.getFullYear()===date_edit.getFullYear() && day_b4.getMonth()===date_edit.getMonth() &&
+                day_b4.getDate()===date_edit.getDate())
+                {
+                    prod_count++;
+                }
+            }
+            day_b4.setDate(day_b4.getDate() - 1);
+            node_day_b4=utils.nodeDate(day_b4);
+        }
+        // if less than majority (4 days) the week was productive, return false. Else, return true.
+        if(prod_count<4)
+        {
+            console.log("10. cnstnt_prod is", false, "b/c only", prod_count, "days was productive.");
+            return false;
+        }
+        else
+        {
+            console.log("10. cnstnt_prod is", true, "since", node_day_b4);
+            return true;
+        }
+    }
+};
 
 // Export functions for use in feedback_cron.js
 module.exports= {
@@ -269,5 +410,8 @@ module.exports= {
     mood_h_streak3: mood_h_streak3,
     burnout7: burnout7,
     workedOffDay: workedOffDay,
-    noworkOnDay: noworkOnDay
+    noworkOnDay: noworkOnDay,
+    lowmood3_pro: lowmood3_pro,
+    lowmood3_nopro: lowmood3_nopro,
+    cnstnt_prod: cnstnt_prod
 }

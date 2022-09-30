@@ -213,7 +213,7 @@ let exmpl_fdbk= {
 
 // everything together
 let example_all={
-  "example": {
+  "example_1": {
     "daily_mood": {
       "date_09_19_2022": 1,
       "date_09_20_2022": 3,

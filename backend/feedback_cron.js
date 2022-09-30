@@ -2,61 +2,76 @@ const notionAPI = require('./notionAPI.js');
 const triggers = require('./msg_triggers.js');
 const utils = require('./utils.js');
 
-// GET database
-const realtimeGetPost = () => {
-
-  const msgs=["Please remember to fill out your template! It's important to help overcome your unique productivity hurdles.",
-  "You haven't done anything this past week! Fill out the template for this week to reassess what went wrong.",
-  "You're frequently tracking your mood. Excellent work!",
-  "Recently, you've been feeling great! Use this to your advantage, get work done!",
-/*overwork*/"You worked all of last week! Try and schedule at least 1 day a week to no work.",
-/*procrast*/"You were productive during an off day! Great work.",
-  "You haven't worked for an on day. Try and stick to those days.",
-/*negative*/"Even through poor mood you're productive. Impressive!",
-  "Go easy on yourself! Don't focus too much on work.",
-  "You were productive for most of last week. You show consistant effort!"];
-
-  // firebase-admin
+// GET and POST to Firebase Realtime database
+const realtimeGetPost = async (msgs) => {
+  // firebase-admin setup
   let admin = require("firebase-admin");
   let serviceAccount = require("./fire_admin_cred.json");
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount.primary),
     databaseURL: serviceAccount.databaseURL
   });
-
+  // more setup before GET and POST
   const db = admin.database();
   const path="users";
   let ref = db.ref(path);
   let example_users_tree={};
   ref.once("value", function(snapshot) {
+    // GET everything under 'users'
     example_users_tree=snapshot.val();
-    
     // General+Specific trigger function results
-    const all_triggers=[triggers.templ_inactive_week(example_users_tree.example.template.api_resp[utils.nodeDate()].getTemplate),
-    triggers.proj_inactive_week(example_users_tree.example.project.api_resp[utils.nodeDate()].getProject),
-    triggers.mood_streak7(example_users_tree.example),
-    triggers.mood_h_streak3(example_users_tree.example),
-    triggers.burnout7(example_users_tree.example),
-    triggers.workedOffDay(example_users_tree.example),
-    triggers.noworkOnDay(example_users_tree.example),
-    triggers.lowmood3_pro(example_users_tree.example),
-    triggers.lowmood3_nopro(example_users_tree.example),
-    triggers.cnstnt_prod(example_users_tree.example)];
-
+    const all_triggers=[triggers.templ_inactive_week(example_users_tree.example_1.template.api_resp[utils.nodeDate()].getTemplate),
+    triggers.proj_inactive_week(example_users_tree.example_1.project.api_resp[utils.nodeDate()].getProject),
+    triggers.mood_streak7(example_users_tree.example_1),
+    triggers.mood_h_streak3(example_users_tree.example_1),
+    triggers.burnout7(example_users_tree.example_1),
+    triggers.workedOffDay(example_users_tree.example_1),
+    triggers.noworkOnDay(example_users_tree.example_1),
+    triggers.lowmood3_pro(example_users_tree.example_1),
+    triggers.lowmood3_nopro(example_users_tree.example_1),
+    triggers.cnstnt_prod(example_users_tree.example_1)];
     // Associated msgs
+    let feedback={};
+    let count=0;
     for(i=0;i<all_triggers.length;i++)
     {
       if(all_triggers[i]===true)
-      feedback.push(msgs[i]);
+      {
+        count++;
+        let curr_name="msg_"+String(count)
+        feedback[curr_name]={};
+        feedback[curr_name].text=msgs.text[i];
+        feedback[curr_name].color=msgs.color[i];
+      }
     }
     console.log(feedback);
-
-    example_users_tree.example["im_here"]="hello";
-    const exampleRef = ref.child('example');
-    exampleRef.set(example_users_tree.example);
+    // POST everything under 'users/example'
+    //example_users_tree.example["im_here"]="hello";
+    //const exampleRef = ref.child('example');
+    //exampleRef.set(example_users_tree.example);
   });
 };
-realtimeGetPost();
+
+// constants
+const msgs_text= [
+  "Please remember to fill out your template! It's important to help overcome your unique productivity hurdles.",
+  "You haven't done anything this past week! Fill out the template for this week to reassess what went wrong.",
+  "You're frequently tracking your mood. Excellent work!",
+  "Recently, you've been feeling great! Use this to your advantage, get work done!",
+  /*overwork*/
+  "You worked all of last week! Try and schedule at least 1 day a week to no work.",
+  /*procrast*/
+  "You were productive during an off day! Great work.",
+  "You haven't worked for an on day. Try and stick to those days.",
+  /*negative*/
+  "Even through poor mood you're productive. Impressive!",
+  "Go easy on yourself! Don't focus too much on work.",
+  "You were productive for most of last week. You show consistant effort!"
+];
+const msgs_color=["red","red","green","green","red","green","yellow","green","blue","green"];
+const msgs={"text":msgs_text,"color":msgs_color};
+// call function
+realtimeGetPost(msgs);
 
 
 
@@ -228,16 +243,7 @@ realtimeGetPost();
 
 // TRIGGERS
                     // CONSTANTS
-const msgs=["Please remember to fill out your template! It's important to help overcome your unique productivity hurdles.",
-            "You haven't done anything this past week! Fill out the template for this week to reassess what went wrong.",
-            "You're frequently tracking your mood. Excellent work!",
-            "Recently, you've been feeling great! Use this to your advantage, get work done!",
-/*overwork*/"You worked all of last week! Try and schedule at least 1 day a week to no work.",
-/*procrast*/"You were productive during an off day! Great work.",
-            "You haven't worked for an on day. Try and stick to those days.",
-/*negative*/"Even through poor mood you're productive. Impressive!",
-            "Go easy on yourself! Don't focus too much on work.",
-            "You were productive for most of last week. You show consistant effort!"];
+
 const feedback=[];
 const get_templ= {
   db_name: 'Database Example for DailyNotion',

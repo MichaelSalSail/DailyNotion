@@ -183,6 +183,41 @@ const msgProject = async (projIntgr, projId, feedback) => {
     return responseResults;
 };
 
+// helper function for updateTemplate
+const entriesTempl = (user_type, week) => {
+    // All 4 curated Notion template questions
+    const positivity=[String(week),
+                      "What is 1 thing you are grateful for today?",
+                      "What is your most recent success? How proud are you from a scale of 1-10?",
+                      "What excites you about your current project?",
+                      "Write down 1 reason you should feel confident working on your project this week."]
+    const balance=[String(week),
+                   "How stressed are you from a scale of 1-10? Explain.",
+                   "What stressors can you remove from your routine this week?",
+                   "Working smarter > working harder. Think of ways you can work more efficient.",
+                   "Do you think your workload is sustainable? Should you be taking more breaks?"]
+    const task_log=[String(week),
+                    "Think back to the last time you procrastinated. What was the task and why did you procrastinate?",
+                    "What is the simplest task you can perform this week to make progress on your project?",
+                    "When is the earliest you can start?",
+                    "Are you feeling confident doing this task at this time frame? Why or why not?"]
+    const goal_set=[String(week),
+                    "What was your most recent goal you failed to complete?",
+                    "Write 3 goals you have atm. Rank them from most interesting to least interesting.",
+                    "Do you think you can stick w/ your first goal? Can you make it more interesting?",
+                    "If you find yourself goal switching, what can you do to stay on track?"]
+    if(user_type==="Overwork (burnout)")
+        return balance;
+    else if(user_type==="Procrastination")
+        return task_log;
+    else if(user_type==="Excessive Negative Thinking")
+        return positivity;
+    else if(user_type==="Excessive Task Switching")
+        return goal_set;
+    else
+        return [String(week),"???","???","???","???"];
+};
+
 //                               CONSTANTS
 // Access template page
 const templateIntgr = new Client({ auth : notion_info.template.tokens.intgr_token});
@@ -190,40 +225,14 @@ const templateId = notion_info.template.tokens.page_token;
 // Access project page
 const projIntgr = new Client({ auth : notion_info.project.tokens.intgr_token});
 const projId = notion_info.project.tokens.page_token;
-// All 4 curated Notion template questions
-const positivity=["1",
-                  "What is 1 thing you are grateful for today?",
-                  "What is your most recent success? How proud are you from a scale of 1-10?",
-                  "What excites you about your current project?",
-                  "Write down 1 reason you should feel confident working on your project this week."]
-const balance=["1",
-               "How stressed are you from a scale of 1-10? Explain.",
-               "What stressors can you remove from your routine this week?",
-               "Working smarter > working harder. Think of ways you can work more efficient.",
-               "Do you think your workload is sustainable? Should you be taking more breaks?"]
-const task_log=["1",
-                "Think back to the last time you procrastinated. What was the task and why did you procrastinate?",
-                "What is the simplest task you can perform this week to make progress on your project?",
-                "When is the earliest you can start?",
-                "Are you feeling confident doing this task at this time frame? Why or why not?"]
-const goal_set=["1",
-                "What was your most recent goal you failed to complete?",
-                "Write 3 goals you have atm. Rank them from most interesting to least interesting.",
-                "Do you think you can stick w/ your first goal? Can you make it more interesting?",
-                "If you find yourself goal switching, what can you do to stay on track?"]
-const notion_templates= {
-    balance: balance,
-    positivity: positivity,
-    task_log: task_log,
-    goal_set: goal_set
-}
+
 // Example feedback for Notion project page
 let comment = "You're doing great! Keep it up."
 
 // Run all function calls and catch any errors
 try {
     getTemplate(templateIntgr,templateId);
-    updateTemplate(templateIntgr,templateId,notion_templates["goal_set"]);
+    updateTemplate(templateIntgr,templateId,entriesTempl("Excessive Task Switching",2));
     getProject(projIntgr,projId);
     msgProject(projIntgr,projId,comment);
 }
@@ -236,5 +245,6 @@ module.exports= {
     getTemplate: getTemplate,
     updateTemplate: updateTemplate,
     getProject: getProject,
-    msgProject: msgProject
+    msgProject: msgProject,
+    entriesTempl: entriesTempl
 }

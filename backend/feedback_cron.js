@@ -1,11 +1,58 @@
 // const notionAPI = require('./notionAPI.js');
 const triggers = require('./msg_triggers.js');
 
-// GET Firebase Realtime code goes here
+// const all_users=GET_Firebase_Realtime("users");
+// let upd_users=all_users;
 
-// node-cron code goes here
+// node-cron(daily, "10PM EST") {
+  // for(user in users) {
+    // const templateIntgr = new Client({ auth : notion_info.template.tokens.intgr_token});
+    // const templateId = notion_info.template.tokens.page_token;
+    // const projIntgr = new Client({ auth : notion_info.project.tokens.intgr_token});
+    // const projId = notion_info.project.tokens.page_token;
+    // upd_users[user].project.api_resp[nodeDate()]={"getProject":{},"msgProject":{}};
+    // upd_users[user].template.api_resp[nodeDate()]={"getTemplate":{},"updateTemplate":{}};
+    // 
+    // get_templ = notionAPI.getTemplate(templateIntgr,templateId);
+    // get_proj = notionAPI.getProject(projIntgr,projId);
+    // upd_users[user].template.api_resp[nodeDate()].getTemplate = get_templ;
+    // upd_users[user].project.api_resp[nodeDate()].getProject = get_proj;
+    // let all_msgs={};
+    // let date_today=utils.nodeDate();
+    // all_msgs[date_today]={};
+    // const msgs_enum=["msg_1","msg_2","msg_3"];
+    // const msgs_content=["Youre doing gr8!","Keep it up!","Dont get discouraged."];
+    // const msgs_color=["blue","red","green"];
+    // let msg_proj={};
+    // for(i in msgs_enum) {
+      // all_msgs[date_today][msgs_enum[i]]={"text":msgs_content[i],"color":msgs_color[i]};
+      // msg_proj[msgs_enum[i]] = notionAPI.msgProject(projIntgr,projId,msgs_content[i]);
+    // }
+    // upd_users[user].feedback[nodeDate()] = all_msgs[nodeDate()];
+    // upd_users[user].project.api_resp[nodeDate()].msgProject=msg_proj;
+  // }
+// };
 
-// POST Firebase Realtime code goes here
+// node-cron(weekly, "Sun 10:01PM EST") {
+  // const templateIntgr = new Client({ auth : notion_info.template.tokens.intgr_token});
+  // const templateId = notion_info.template.tokens.page_token;
+  // const projIntgr = new Client({ auth : notion_info.project.tokens.intgr_token});
+  // const projId = notion_info.project.tokens.page_token;
+  // if(upd_users[user].template.api_resp[nodeDate()]===undefined)
+    // upd_users[user].template.api_resp[nodeDate()]={"getTemplate":{},"updateTemplate":{}};
+
+  // for(user in users) {
+    // if(upd_users[user].week===undefined)
+      // upd_users[user].week=1;
+    // else {
+      // entriesTempl
+      // upd_templ = notionAPI.updateTemplate(templateIntgr,templateId,entriesTempl(upd_users[user].ques_respon.answ_1,upd_users[user].week+1));
+      // upd_users[user].template.api_resp[nodeDate()].updateTemplate=upd_templ;
+      // upd_users[user].week+=1;
+  // }
+// };
+
+// POST_Firebase_Realtime("users",upd_users);
 
 // This is an example
 // lets assume right before node-cron runs on date_09_24_2022,

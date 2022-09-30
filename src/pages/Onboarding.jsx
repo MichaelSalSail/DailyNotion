@@ -10,6 +10,7 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";  //theme
 import "primereact/resources/primereact.min.css";                  //core css
 import "primeicons/primeicons.css";                                //icons
 
+import fireDB from '../fire.js';
 
 const { useEffect, useState, useRef } = React;
 
@@ -63,13 +64,48 @@ const Onboarding = ({handleLogout, user, email}) =>{
     const footer = <span>
         <Button label="Submit" onClick={() => {handleSubmit();}} icon="pi pi-check" style={{marginRight: '.25em', width: '20em'}}/>
     </span> 
-    
-    function handleSubmit(){
-        console.log(setQ1.value)
+
+
+    // to verify the selected values of the questions
+    function debug(){
+        console.log("email: " + email)
+        console.log(selectedQ1)
+        console.log(selectedQ2)
+        console.log(selectedQ3)
+        console.log(selectedQ4)
+        console.log(selectedQ5)
     }
+
+    function verifyAns(ans){ // verifies if the answers are non-empty
+        if (ans.includes(null)){
+            return false
+        }
+        for (let i = 0; i < ans.length; i++){
+            if (ans[i].length == 0){
+                return false
+            } 
+        }
+        return true
+    }
+
+    function handleSubmit(){
+        let ans = [selectedQ1, selectedQ2, selectedQ3, selectedQ4, selectedQ5]
+        debug()
+
+        if (verifyAns(ans)){
+            
+            fireDB.WriteOnboarding(ans)
+            console.log("SUCESS!")
+        }
+
+    }
+
+    
     return(
-            <div style={{margin:'8%'}}>
+            <div style={{margin:'3%'}}>
+            <div style={{width: '60%'}}>
             <Card footer={footer} title="Welcome to DailyNotion!" subTitle="Please answer the questions below to get started">
+            <img width='300px' height='300px' src='/static/images/dark_daily_notion.png'/>
             <h3> 1) What is your most common productivity hurdle? </h3> <br></br>
             <MultiSelect  showSelectAll="false" selectionLimit="1" placeholder="Select One" optionLabel="label" value={selectedQ1} options={prod_problems} onChange={(e) => setQ1(e.value)} />
             <br></br><br></br>
@@ -86,6 +122,8 @@ const Onboarding = ({handleLogout, user, email}) =>{
             <MultiSelect display="chip" showSelectAll="false" selectionLimit="3" placeholder="Select 1-3" optionLabel="label" value={selectedQ5} options={weekdays} onChange={(e) => setQ5(e.value)} />
             
             </Card>
+            </div>
+            
             </div>
     );
 };      

@@ -41,7 +41,7 @@ const App = () => {
   // If so, go to the Home page (Main.jsx)
   const handleLogin= () =>{
     setCurrUser(fireDB.getUserID(email))
-    //console.log("handleLogin: " +currUser)
+    console.log("handleLogin: " +currUser)
     clearError();
       signInWithEmailAndPassword(auth,email,password)
       .catch(err => {
@@ -81,6 +81,7 @@ const App = () => {
     });
     // new entry under node 'Users' in Firebase Realtime
     fireDB.set_new_user(fireDB.user_skeleton,email);
+    setCurrUser(fireDB.getUserID(email))
   };
 
   const handleLogout = () => {

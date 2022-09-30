@@ -63,6 +63,20 @@ function debug(str){
 }
 
 
+// POST onboarding responses 
+// WARNING: if userIDRef is not defined, then it will populated responses in users/ques_respon 
+function WriteOnboarding(ans){
+  const db = getDatabase();
+  set(ref(db, 'users/' + userIDRef + '/ques_respon'), {
+    answ_1 : ans[0],
+    answ_2 : ans[1],
+    answ_3 : ans[2],
+    answ_4 : ans[3],
+    answ_5 : ans[4]
+  });
+
+}
+
 // POST daily check in submission
 function WriteDailyCheckIn( date, mood){
   const db = getDatabase();
@@ -148,6 +162,7 @@ function set_new_user(user_json, user_email) {
   user_json[user_id] = user_json["example"];
   delete user_json["example"];
   // POST to repo
+  userIDRef = user_id
   writeUserInfo(user_json);
 }
 
@@ -320,7 +335,8 @@ let fireDB = {
   checkOnboarded: checkOnboarded,
   getUserID: getUserID,
   debug: debug,
-  WriteDailyCheckIn: WriteDailyCheckIn
+  WriteDailyCheckIn: WriteDailyCheckIn,
+  WriteOnboarding: WriteOnboarding
 };
 
 export default fireDB;

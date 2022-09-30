@@ -126,8 +126,6 @@ const updateTemplate = async (templateIntgr, templateId, templText) => {
         object: response.object,
         // ISO 8601 time -> Date object -> String
         created_time: new Date(response.created_time).toString('en', {timezone: 'EST'}),
-        parent: response.parent,
-        properties: response.properties
     };
     console.log("updateTemplate()", responseResults);
     return responseResults;
@@ -230,7 +228,7 @@ const projId = notion_info.project.tokens.page_token;
 let comment = "You're doing great! Keep it up."
 
 // Run all function calls and catch any errors
-try {
+/*try {
     getTemplate(templateIntgr,templateId);
     updateTemplate(templateIntgr,templateId,entriesTempl("Excessive Task Switching",2));
     getProject(projIntgr,projId);
@@ -238,7 +236,7 @@ try {
 }
 catch(error) {
     console.log(error);
-}
+}*/
 
 // Export functions to run in feedback_cron.js
 module.exports= {

@@ -146,65 +146,172 @@ const exmpl_answ={
 // 2. Daily Mood
 const exmpl_mood={
   // todays_date: scale of 1 to 5 (1 is sad, 5 is happy)
-  date_08_30_2022: 1
+  date_09_30_2022: 1
 }
 // 3. User must submit project dates and associated tokens.
 //    Our API can now track the project page during these dates.
 const project_space={
-  tokens: {
-    intgr_token: "Internal_Integration_token_value",
-    page_token: "Database_token_value"
-  },
-  timeline: {
-    start_date: "09/07/2022",
-    end_date: "10/06/2022"
-  },
-  // We need to automate API calls.
-  // Idk how we're going to do it, but it sounds exciting!
-  api_resp: {
-    // I'm thinking we schedule API calls daily at 11:59PM everyday.
-    date_08_30_2022: {
-      last_edit: "17:08:00 GMT-0400 (Eastern Daylight Time)"
+  "api_resp": {
+    "date_09_30_2022": {
+      "getProject": {pg_last_edit_time:'Thu Sep 29 2022 12:02:00 GMT-0400 (Eastern Daylight Time)'},
+      "msgProject": {
+        object: 'comment',
+        created_time: 'Tue Sep 27 2022 12:12:00 GMT-0400 (Eastern Daylight Time)',
+        content: "You're doing great! Keep it up."
+      }
     }
+  },
+  "tokens": {
+    "intgr_token": "Internal_Integration_token_value",
+    "page_token": "Database_token_value"
   }
 }
 // 4. User must create a copy of our template in their workspace. 
 //    User must submit associated tokens.
 //    Our API can now track the template page during these dates.
 const template_space={
-  tokens: {
-    intgr_token: "Internal_Integration_token_value",
-    page_token: "Database_token_value"
-  },
-  api_resp: {
-    days: {
-      date_08_30_2022: {
-        // probably not as important as for the project page, but who knows
-        // I'm thinking we schedule API calls daily at 11:59PM everyday.
-        last_edit: "21:21:00 GMT-0400 (Eastern Daylight Time)"
-      }
-    },
-    weeks: {
-      end_week_1: {
-        // If exactly one week has passed since template tokens submitted, 
-        // or since our last API calls, do the following:
-        // First, make a GET request to view all entries from the current week.
-        // Count the entries that are NOT blank.
-        // Value should range from 0-4 since each template only has 4 columns.
-        cells_complete: 4
-        // Last, we make an API POST request to add another row to the database
-        // so the user can write entries for the next week.
-      }
+  "api_resp": {
+    "date_09_30_2022": {
+        "getTemplate": {
+            db_name: 'Database Example for DailyNotion', 
+            db_init_time: 'Tue Aug 02 2022 21:21:00 GMT-0400 (Eastern Daylight Time)', 
+            db_last_edit_time: 'Tue Sep 20 2022 23:44:00 GMT-0400 (Eastern Daylight Time)'
+        },
+        "updateTemplate": {
+            object: 'page',
+            created_time: 'Thu Sep 22 2022 23:37:00 GMT-0400 (Eastern Daylight Time)',
+            parent: {
+            type: 'database_id',
+            database_id: '12903875-e42d-112e-9690-810719d1c18f' 
+            },
+            properties: {
+            'Question 3': { id: 'UOob', type: 'rich_text', rich_text: [Array] },
+            'Question 4': { id: 'tHma', type: 'rich_text', rich_text: [Array] },
+            'Question 2': { id: 'tc~%40', type: 'rich_text', rich_text: [Array] },
+            'Question 1': { id: 'u%7C%3DI', type: 'rich_text', rich_text: [Array] },
+            Week: { id: 'title', type: 'title', title: [Array] }
+            }
+        }
     }
+  },
+  "tokens": {
+    "intgr_token": "Internal_Integration_token_value",
+    "page_token": "Database_token_value"
   }
 }
-// putting everything together
+// 5. feedback
+// msgs and associated colors that should be displayed
+// through our app under a particular date
+let exmpl_fdbk= {
+  date_09_30_2022: {
+    msg_1: { text: "You're frequently tracking your mood. Excellent work!", color: "green" },
+    msg_2: { text: "Recently, you've been feeling great! Use this to your advantage, get work done!", color: "green" },
+    msg_3: { text: "You worked all of last week! Try and schedule at least 1 day a week to no work.", color: "red" }
+  }
+}
+
+
+// everything together
 let example_all={
-  example: {
-    ques_respon: exmpl_answ,
-    daily_mood: exmpl_mood,
-    project: project_space,
-    template: template_space
+  "example": {
+    "daily_mood": {
+      "date_09_19_2022": 1,
+      "date_09_20_2022": 3,
+      "date_09_21_2022": 1,
+      "date_09_22_2022": 1,
+      "date_09_23_2022": 3,
+      "date_09_24_2022": 2,
+      "date_09_25_2022": 4,
+      "date_09_26_2022": 5,
+      "date_09_27_2022": 3,
+      "date_09_28_2022": 2,
+      "date_09_29_2022": 1,
+      "date_09_30_2022": 3
+    },
+    "project": {
+      "api_resp": {
+          "date_09_22_2022": {
+            "getProject": {pg_last_edit_time:'Thu Sep 22 2022 21:37:00 GMT-0400 (Eastern Daylight Time)'}
+          },
+          "date_09_23_2022": {
+            "getProject": {pg_last_edit_time:'Fri Sep 23 2022 21:37:00 GMT-0400 (Eastern Daylight Time)'}
+          },
+          "date_09_24_2022": {
+            "getProject": {pg_last_edit_time:'Sat Sep 24 2022 21:37:00 GMT-0400 (Eastern Daylight Time)'}
+          },
+          "date_09_25_2022": {
+            "getProject": {pg_last_edit_time:'Sun Sep 25 2022 21:37:00 GMT-0400 (Eastern Daylight Time)'}
+          },
+          "date_09_26_2022": {
+            "getProject": {pg_last_edit_time:'Sun Sep 25 2022 21:37:00 GMT-0400 (Eastern Daylight Time)'}
+          },
+          "date_09_27_2022": {
+            "getProject": {pg_last_edit_time:'Sat Sep 24 2022 21:37:00 GMT-0400 (Eastern Daylight Time)'}
+          },
+          "date_09_28_2022": {
+            "getProject": {pg_last_edit_time:'Thu Sep 22 2022 12:02:00 GMT-0400 (Eastern Daylight Time)'}
+          },
+          "date_09_29_2022": {
+            "getProject": {pg_last_edit_time:'Fri Sep 23 2022 12:02:00 GMT-0400 (Eastern Daylight Time)'}
+          },
+          "date_09_30_2022": {
+            "getProject": {pg_last_edit_time:'Thu Sep 29 2022 12:02:00 GMT-0400 (Eastern Daylight Time)'}
+          }
+      },
+      "tokens": {
+        "intgr_token": "Internal_Integration_token_value",
+        "page_token": "Database_token_value"
+      }
+    },
+    "ques_respon": {
+      "answ_1": "Excessive Negative Thinking",
+      "answ_2": "Great",
+      "answ_3": [
+        "Mon",
+        "Wed",
+        "Fri"
+      ],
+      "answ_4": [
+        "Early Afternoon (12PM-3PM)",
+        "Early Evening (6PM-9PM)"
+      ],
+      "answ_5": [
+        "Sun",
+        "Tue",
+        "Sat"
+      ],
+      "answ_6": [
+        "Early Morning (6AM-9AM)",
+        "Night (12AM-5AM)"
+      ]
+    },
+    "template": {
+      "api_resp": {
+        "date_09_30_2022": {
+            "getTemplate": {
+                db_name: 'Database Example for DailyNotion', 
+                db_init_time: 'Tue Aug 02 2022 21:21:00 GMT-0400 (Eastern Daylight Time)', 
+                db_last_edit_time: 'Tue Sep 20 2022 23:44:00 GMT-0400 (Eastern Daylight Time)'
+            },
+            "updateTemplate": {
+                object: 'page',
+                created_time: 'Thu Sep 22 2022 23:37:00 GMT-0400 (Eastern Daylight Time)'
+            }
+        }
+      },
+      "tokens": {
+        "intgr_token": "Internal_Integration_token_value",
+        "page_token": "Database_token_value"
+      }
+    },
+    "feedback": {
+        "date_09_30_2022": {
+            msg_1: {
+                "text": "Keep it up. You're doing great!",
+                "color": "green"
+            }
+      }
+    }
   }
 }
 writeUserInfo(example_all);
@@ -214,21 +321,31 @@ read_que_ans("example");
 
 // make a blank template for new users
 let user_skeleton= {
-  example: {
-    ques_respon: { answ_1: "", answ_2: "", answ_3: [""], answ_4: [""], answ_5: [""], answ_6: [""] },
-    daily_mood: { date_00_00_0000: -1 },
-    project: {
-      tokens: { intgr_token: "", page_token: "" },
-      timeline: { start_date: "", end_date: "" },
-      api_resp: { date_00_00_0000: { last_edit: "" } }
-    },
-    template: {
-      tokens: { intgr_token: "", page_token: "" },
-      api_resp: { 
-        days: { date_00_00_0000: { last_edit: ""} },
-        weeks: { end_week_0: { cells_complete: -1}}
+  "example": {
+    "daily_mood": {},
+    "project": {
+      "api_resp": {},
+      "tokens": {
+        "intgr_token": "Internal_Integration_token_value",
+        "page_token": "Database_token_value"
       }
-    }
+    },
+    "ques_respon": {
+      "answ_1": "",
+      "answ_2": "",
+      "answ_3": [],
+      "answ_4": [],
+      "answ_5": [],
+      "answ_6": []
+    },
+    "template": {
+      "api_resp": {},
+      "tokens": {
+        "intgr_token": "Internal_Integration_token_value",
+        "page_token": "Database_token_value"
+      }
+    },
+    "feedback": {}
   }
 }
 

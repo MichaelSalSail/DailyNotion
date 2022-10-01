@@ -26,8 +26,8 @@ const realtimeGetPost = async (msgs, notionGET) => {
     // GET everything under 'users'
     example_users_tree=snapshot.val();
     // set-up necessary properties
-    example_users_tree.example_1.project.api_resp[utils.nodeDate()]={"getProject":notionGET.get_proj};
-    example_users_tree.example_1.template.api_resp[utils.nodeDate()]={"getTemplate":notionGET.get_templ};
+    example_users_tree.example_1.project.api_resp[utils.nodeDate()]={"getProject":notionGET.get_proj,"msgProject":{}};
+    example_users_tree.example_1.template.api_resp[utils.nodeDate()]={"getTemplate":notionGET.get_templ,"updateTemplate":{}};
     example_users_tree.example_1.feedback[utils.nodeDate()]={};
     // General+Specific trigger function results
     const all_triggers=[triggers.templ_inactive_week(example_users_tree.example_1.template.api_resp[utils.nodeDate()].getTemplate),
@@ -43,17 +43,37 @@ const realtimeGetPost = async (msgs, notionGET) => {
     // Associated msgs
     let feedback={};
     let count=0;
+    let comment_count=0;
+    // retieve notion project tokens for POST call.
+    const projIntgr = new Client({ auth : notion_info.project.tokens.intgr_token});
+    const projId = notion_info.project.tokens.page_token;
     for(i=0;i<all_triggers.length;i++)
     {
       if(all_triggers[i]===true)
       {
         count++;
-        let curr_name="msg_"+String(count)
+        let curr_name="msg_"+String(count);
         feedback[curr_name]={};
         feedback[curr_name].text=msgs.text[i];
         feedback[curr_name].color=msgs.color[i];
+        // Write the msg as a comment to project page
+        // NOTE: There appears to be a limit to the amount of comments that
+        // can be written in a short period of time. It appears to be max. 2.
+        if(count===1)
+        {
+          notionAPI.msgProject(projIntgr,projId,feedback[curr_name].text).then(()=>{console.log("Comment POST success.")});
+          comment_count++;
+        }
       }
     }
+    // instead of updating Realtime w/ all Notion POST responses for msgProject(),
+    // only update w/ the number of submitted comments.
+    if(count>1)
+    {
+      notionAPI.msgProject(projIntgr,projId,"There's more feedback! Login to web app for more...").then(()=>{console.log("Comment POST success.")});
+      comment_count++;
+    }
+    example_users_tree.example_1.project.api_resp[utils.nodeDate()].msgProject={"total_cmnts": comment_count};
     console.log(feedback);
     example_users_tree.example_1.feedback[utils.nodeDate()]=feedback;
     // POST everything under 'users/example_1'

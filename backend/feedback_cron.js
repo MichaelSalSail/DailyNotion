@@ -4,99 +4,13 @@ const triggers = require('./msg_triggers.js');
 const utils = require('./utils.js');
 const cron = require('node-cron');
 const notion_info=require('./notion_tokens.js');
-
-// POST the notion GET responses and msgs to database
-const realtimeGetPost = async (msgs, notionGET) => {
-  console.log("In realtimeGetPost!");
-  console.log("The name of project page is",notionGET.get_proj.pg_name);
-  console.log("The name of template database is",notionGET.get_templ.db_name);
-  // firebase-admin setup
-  let admin = require("firebase-admin");
-  let serviceAccount = require("./fire_admin_cred.json");
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount.primary),
-    databaseURL: serviceAccount.databaseURL
-  });
-  // more setup before GET and POST
-  const db = admin.database();
-  const path="users";
-  let ref = db.ref(path);
-  let example_users_tree={};
-  ref.once("value", function(snapshot) {
-    // GET everything under 'users'
-    example_users_tree=snapshot.val();
-    // set-up necessary properties
-    example_users_tree.example_1.project.api_resp[utils.nodeDate()]={"getProject":notionGET.get_proj,"msgProject":{}};
-    example_users_tree.example_1.template.api_resp[utils.nodeDate()]={"getTemplate":notionGET.get_templ,"updateTemplate":{}};
-    example_users_tree.example_1.feedback[utils.nodeDate()]={};
-    // General+Specific trigger function results
-    const all_triggers=[triggers.templ_inactive_week(example_users_tree.example_1.template.api_resp[utils.nodeDate()].getTemplate),
-    triggers.proj_inactive_week(example_users_tree.example_1.project.api_resp[utils.nodeDate()].getProject),
-    triggers.mood_streak7(example_users_tree.example_1),
-    triggers.mood_h_streak3(example_users_tree.example_1),
-    triggers.burnout7(example_users_tree.example_1),
-    triggers.workedOffDay(example_users_tree.example_1),
-    triggers.noworkOnDay(example_users_tree.example_1),
-    triggers.lowmood3_pro(example_users_tree.example_1),
-    triggers.lowmood3_nopro(example_users_tree.example_1),
-    triggers.cnstnt_prod(example_users_tree.example_1)];
-    // Associated msgs
-    let feedback={};
-    let count=0;
-    let comment_count=0;
-    // retieve notion project tokens for POST call.
-    const projIntgr = new Client({ auth : notion_info.project.tokens.intgr_token});
-    const projId = notion_info.project.tokens.page_token;
-    for(i=0;i<all_triggers.length;i++)
-    {
-      if(all_triggers[i]===true)
-      {
-        count++;
-        let curr_name="msg_"+String(count);
-        feedback[curr_name]={};
-        feedback[curr_name].text=msgs.text[i];
-        feedback[curr_name].color=msgs.color[i];
-        // Write the msg as a comment to project page
-        // NOTE: There appears to be a limit to the amount of comments that
-        // can be written in a short period of time. It appears to be max. 2.
-        if(count===1)
-        {
-          notionAPI.msgProject(projIntgr,projId,feedback[curr_name].text).then(()=>{console.log("Comment POST success.")});
-          comment_count++;
-        }
-      }
-    }
-    // instead of updating Realtime w/ all Notion POST responses for msgProject(),
-    // only update w/ the number of submitted comments.
-    if(count>1)
-    {
-      notionAPI.msgProject(projIntgr,projId,"There's more feedback! Login to web app for more...").then(()=>{console.log("Comment POST success.")});
-      comment_count++;
-    }
-    example_users_tree.example_1.project.api_resp[utils.nodeDate()].msgProject={"total_cmnts": comment_count};
-    console.log(feedback);
-    example_users_tree.example_1.feedback[utils.nodeDate()]=feedback;
-    // POST everything under 'users/example_1'
-    const exampleRef = ref.child('example_1');
-    exampleRef.set(example_users_tree.example_1);
-  });
-};
-
-// perform both Notion API GET requests and return a json containing both
-// then, call realtimeGetPost()
-const notionGET = async (msgs) => {
-  // Access template page
-  const templateIntgr = new Client({ auth : notion_info.template.tokens.intgr_token});
-  const templateId = notion_info.template.tokens.page_token;
-  // Access project page
-  const projIntgr = new Client({ auth : notion_info.project.tokens.intgr_token});
-  const projId = notion_info.project.tokens.page_token;
-  notionAPI.getProject(projIntgr,projId).then(get_proj => {
-    notionAPI.getTemplate(templateIntgr,templateId).then(get_templ => {
-      realtimeGetPost(msgs,{get_templ: get_templ, get_proj: get_proj});
-    });
-  });
-};
+// firebase-admin setup
+let admin = require("firebase-admin");
+let serviceAccount = require("./fire_admin_cred.json");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount.primary),
+  databaseURL: serviceAccount.databaseURL
+});
 
 // constants
 const msgs_text= [
@@ -117,6 +31,106 @@ const msgs_text= [
 const msgs_color=["red","red","green","green","red","green","yellow","green","blue","green"];
 const msgs={"text":msgs_text,"color":msgs_color};
 
+
+// POST the notion GET responses and msgs to database
+const realtimeGetPost = async (current_user,notionGET,user,ref) => {
+  console.log("In realtimeGetPost!");
+  console.log("The name of project page is",notionGET.get_proj.pg_name);
+  console.log("The name of template database is",notionGET.get_templ.db_name);
+
+  // set-up necessary properties
+  current_user.project.api_resp[utils.nodeDate()]={"getProject":notionGET.get_proj,"msgProject":{}};
+  current_user.template.api_resp[utils.nodeDate()]={"getTemplate":notionGET.get_templ,"updateTemplate":{}};
+  current_user.feedback[utils.nodeDate()]={};
+  // General+Specific trigger function results
+  const all_triggers=[triggers.templ_inactive_week(current_user.template.api_resp[utils.nodeDate()].getTemplate),
+  triggers.proj_inactive_week(current_user.project.api_resp[utils.nodeDate()].getProject),
+  triggers.mood_streak7(current_user),
+  triggers.mood_h_streak3(current_user),
+  triggers.burnout7(current_user),
+  triggers.workedOffDay(current_user),
+  triggers.noworkOnDay(current_user),
+  triggers.lowmood3_pro(current_user),
+  triggers.lowmood3_nopro(current_user),
+  triggers.cnstnt_prod(current_user)];
+  // Associated msgs
+  let feedback={};
+  let count=0;
+  let comment_count=0;
+  // retieve notion project tokens for POST call.
+  const projIntgr = new Client({ auth : notion_info.project.tokens.intgr_token});
+  const projId = notion_info.project.tokens.page_token;
+  for(i=0;i<all_triggers.length;i++)
+  {
+    if(all_triggers[i]===true)
+    {
+      count++;
+      let curr_name="msg_"+String(count);
+      feedback[curr_name]={};
+      feedback[curr_name].text=msgs.text[i];
+      feedback[curr_name].color=msgs.color[i];
+      // Write the msg as a comment to project page
+      // NOTE: There appears to be a limit to the amount of comments that
+      // can be written in a short period of time. It appears to be max. 1.
+      if(count===1)
+      {
+        notionAPI.msgProject(projIntgr,projId,feedback[curr_name].text).then(()=>{console.log("Comment POST success.")});
+        comment_count++;
+      }
+    }
+  }
+  // instead of updating Realtime w/ all Notion POST responses for msgProject(),
+  // only update w/ the number of submitted comments.
+  current_user.project.api_resp[utils.nodeDate()].msgProject={"total_cmnts": comment_count};
+  console.log(feedback);
+  current_user.feedback[utils.nodeDate()]=feedback;
+  // POST everything under 'users/example_1'
+  const exampleRef = ref.child(user);
+  exampleRef.set(current_user);
+};
+
+// perform both Notion API GET requests and return a json containing both
+// then, call realtimeGetPost()
+const notionGET = async (curr_user_tree, user, ref) => {
+  // Access template page
+  const templateIntgr = new Client({ auth : notion_info.template.tokens.intgr_token});
+  const templateId = notion_info.template.tokens.page_token;
+  // Access project page
+  const projIntgr = new Client({ auth : notion_info.project.tokens.intgr_token});
+  const projId = notion_info.project.tokens.page_token;
+  notionAPI.getProject(projIntgr,projId).then(get_proj => {
+    notionAPI.getTemplate(templateIntgr,templateId).then(get_templ => {
+      realtimeGetPost(curr_user_tree,{get_templ: get_templ, get_proj: get_proj}, user, ref);
+    });
+  });
+};
+
+const usersGET = async () => {
+  // setup before GET and POST
+  const db = admin.database();
+  const path="users";
+  let ref = db.ref(path);
+  let example_users_tree={};
+  ref.once("value", function(snapshot) {
+    // GET everything under 'users'
+    example_users_tree=snapshot.val();
+    for(user in example_users_tree)
+    {
+      console.log(user);
+      if(user==="example" || user==="example_1")
+      {
+        console.log("PROCEED");
+        notionGET(example_users_tree[user], user, ref);
+      }
+      else
+      {
+        console.log("GO NEXT");
+        continue;
+      }
+    }
+  });
+};
+
 // create valid node-cron expressions
 let daily="0 22 * * *";
 let weekly="2 22 * * Sun";
@@ -124,7 +138,8 @@ console.log(cron.validate(daily),cron.validate(weekly));
 
 // call function
 cron.schedule("*/1 * * * *", function() {
-  notionGET(msgs);
+  usersGET();
+  // notionGET();
 });
 
 

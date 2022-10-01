@@ -74,7 +74,7 @@ export default function DailyCheckIn() {
 
   function handleSubmit() {
       fireDB.WriteDailyCheckIn(DateValue, MoodValue);
-  }
+  }  
 
 
   return (

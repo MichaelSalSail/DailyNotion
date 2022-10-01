@@ -1,6 +1,8 @@
 import React, {useState, useEffect} from "react";
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
 
 import './App.css';
 import Login from './pages/Login';
@@ -37,12 +39,12 @@ const App = () => {
     setPasswordError('');
   }
 
+
   // Check if user input matches credentials stored in firebase.
   // If so, go to the Home page (Main.jsx)
   const handleLogin= () =>{
-    setCurrUser(fireDB.getUserID(email))
-    console.log("handleLogin: " +currUser)
     clearError();
+    console.log("handling login..")
       signInWithEmailAndPassword(auth,email,password)
       .catch(err => {
         switch(err.code){
@@ -56,11 +58,14 @@ const App = () => {
             break;
         }
       });
-      //console.log(fireDB.checkOnboarded("example"))
-      
-      //console.log(fireDB.checkOnboarded(currUser))
-      
-      //setOnboard(fireDB.checkOnboarded(currUser)) 
+      setCurrUser(fireDB.getUserID(email))
+
+
+/*       if (fireDB.checkOnboarded(fireDB.getUser())){
+        return <Navigate to='/Dashboard'/>
+      } else {
+        return <Navigate to='/Onboarding'/>
+      } */
   };
 
   // Prevents the user from signing up for 3 cases.
@@ -82,6 +87,7 @@ const App = () => {
     // new entry under node 'Users' in Firebase Realtime
     fireDB.set_new_user(fireDB.user_skeleton,email);
     setCurrUser(fireDB.getUserID(email))
+  
   };
 
   const handleLogout = () => {
@@ -95,6 +101,7 @@ const App = () => {
       if(user){
         clearInput();
         setUser(user);
+        setCurrUser(fireDB.getUserID(user.email));
       }else{
         setUser("");
       }
@@ -113,14 +120,86 @@ const App = () => {
       {/* In my other project, my team created a 'routes.js' to clearly label all web app links
           then imported the file to App.js. I'll do that eventually so it looks neater.
           */}
+
+
+{user ? (
+          fireDB.checkOnboarded(fireDB.getUser()) ? (
+            <Router>
+                <Routes>
+                <Route exact path="/Onboarding" 
+                        element={<Navigate to='/Dashboard'/>}/>
+                <Route exact path="/Dashboard" 
+                        element={<Main handleLogout={handleLogout} user={user} email={email}/>}/>
+                </Routes>
+            </Router>
+            ) : (
+            <Router>
+                <Routes>
+                <Route exact path="/" 
+                        element={<Navigate to='/Onboarding'/>}/>
+                <Route exact path="/Onboarding" 
+                        element={<Onboarding handleLogout={handleLogout} user={user} email={email}/>}/>
+                <Route exact path="/Dashboard" 
+                        element={<Main handleLogout={handleLogout} user={user} email={email}/>}/>
+                </Routes>
+            </Router>
+  )
+      ) : (
+      <Router>
+          <Routes>
+            <Route exact path="/"
+                   element={<Login 
+                   email = {email} 
+                   setEmail = {setEmail} 
+                   password = {password}
+                   setPassword = {setPassword}
+                   handleLogin = {handleLogin}
+                   handleSignup = {handleSignup}
+                   hasAccount = {hasAccount}
+                   setHasAccount ={setHasAccount}
+                   emailError = {emailError}
+                   passwordError = {passwordError}/>}/>
+          </Routes>
+        </Router>
+      )}
       
-          
+    
+
+{/*         
+
+
+      <Router>
+          <Routes>
+          <Route exact path="/" 
+                   element={<Main handleLogout={handleLogout} user={user} email={email}/>}/>
+          </Routes>
+      </Router>
+      
+  {fireDB.checkOnboarded(fireDB.getUser()) ? (
+      <Router>
+          <Routes>
+          <Route exact path="/" 
+                   element={<Main handleLogout={handleLogout} user={user} email={email}/>}/>
+          </Routes>
+      </Router>
+      ) : (
+      <Router>
+          <Routes>
+          <Route exact path="/" 
+                  element={<Onboarding handleLogout={handleLogout} user={user} email={email}/>}/>
+          </Routes>
+      </Router>
+      )}
+
+
       {user ? ( // if user is true
-        fireDB.checkOnboarded(fireDB.debug(currUser)) ? ( // if onboarded
+        fireDB.checkOnboarded(fireDB.getUser()) ? ( // if onboarded
         <Router>
           <Routes>
           <Route exact path="/" 
                    element={<Main handleLogout={handleLogout} user={user} email={email}/>}/>
+          <Route exact path="/onboarding" 
+                   element={<Navigate to="/"/>}/>
           </Routes>
         </Router> 
         ) : ( // if not onboarded <Route exact path="/" element={<Navigate to="/onboarding"/>}/>  
@@ -130,6 +209,8 @@ const App = () => {
                    element={<Navigate to="/onboarding"/>}/>
           <Route exact path="/onboarding" 
                    element={<Onboarding handleLogout={handleLogout} user={user} email={email}/>}/>
+          <Route exact path="/done" 
+                   element={<Main handleLogout={handleLogout} user={user} email={email}/>}/>
           </Routes>
         </Router>) 
         ) : ( // if user is false 
@@ -152,21 +233,13 @@ const App = () => {
 
       )}
 
-{/*         
-      {user ? (
-        <Router>
+              <Router>
           <Routes>
-            <Route exact path="/" 
-                   element={<Navigate to="/onboarding"/>}/>
-
-            <Route exact path="/onboarding" 
+          <Route exact path="/Onboarding" 
                    element={<Onboarding handleLogout={handleLogout} user={user} email={email}/>}/>
-          </Routes>
-        </Router>
-      ):(
-        <Router>
-          <Routes>
-            <Route exact path="/"
+          <Route exact path="/Dashboard" 
+                   element={<Main handleLogout={handleLogout} user={user} email={email}/>}/>
+          <Route exact path="/"
                    element={<Login 
                    email = {email} 
                    setEmail = {setEmail} 
@@ -178,9 +251,8 @@ const App = () => {
                    setHasAccount ={setHasAccount}
                    emailError = {emailError}
                    passwordError = {passwordError}/>}/>
-          </Routes>
+           </Routes>
         </Router>
-      )}
  */}
 
     

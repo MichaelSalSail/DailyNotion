@@ -12,6 +12,17 @@ import "primeicons/primeicons.css";                                //icons
 
 import fireDB from '../fire.js';
 
+import { useNavigate } from 'react-router-dom';
+
+import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+
+import Main from './Main'
+
+import App from '../App'
+
+import { Navigate } from 'react-router-dom';
+import { Redirect } from "react-router-dom";
+
 const { useEffect, useState, useRef } = React;
 
 
@@ -55,20 +66,25 @@ const daytimes = [
 
 
 const Onboarding = ({handleLogout, user, email}) =>{
+
+
     const [selectedQ1, setQ1] = useState(null)
     const [selectedQ2, setQ2] = useState(null)
     const [selectedQ3, setQ3] = useState(null)
     const [selectedQ4, setQ4] = useState(null)
     const [selectedQ5, setQ5] = useState(null)
+    const [toDash, setDash] = useState(false)
 
     const footer = <span>
         <Button label="Submit" onClick={() => {handleSubmit();}} icon="pi pi-check" style={{marginRight: '.25em', width: '20em'}}/>
+
     </span> 
 
 
     // to verify the selected values of the questions
     function debug(){
-        console.log("email: " + email)
+        
+        //console.log("handleSubmit() -> fireDB.getUser(): " + fireDB.getUser())
         console.log(selectedQ1)
         console.log(selectedQ2)
         console.log(selectedQ3)
@@ -91,16 +107,16 @@ const Onboarding = ({handleLogout, user, email}) =>{
     function handleSubmit(){
         let ans = [selectedQ1, selectedQ2, selectedQ3, selectedQ4, selectedQ5]
         debug()
-
+            
         if (verifyAns(ans)){
             
             fireDB.WriteOnboarding(ans)
             console.log("SUCESS!")
+            setDash(true)
         }
 
     }
 
-    
     return(
             <div style={{margin:'3%'}}>
             <div style={{width: '60%'}}>
@@ -124,7 +140,12 @@ const Onboarding = ({handleLogout, user, email}) =>{
             </Card>
             </div>
             
+                {toDash && (
+                    <Navigate to="/Dashboard" replace={true} />
+                    )}
             </div>
+
+
     );
 };      
 export default Onboarding;

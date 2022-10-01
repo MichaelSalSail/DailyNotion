@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import {initializeApp} from 'firebase/app'
-import {getDatabase, ref, onValue, set, update, push, child, get} from 'firebase/database';
+import {getDatabase, ref, onValue, set, update, push, child} from 'firebase/database';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -23,6 +23,9 @@ const fire_app = initializeApp(firebaseConfig);
 
 // Reference value for user
 let userIDRef = ''
+
+// Cache for onboarded userID
+let cache = new Set()
 
 // POST references under 'references' node on Firebase Realtime
 function writeRefrnces(refr_info) {
@@ -57,6 +60,11 @@ function getUserID(user_email){
   return user_id
 }
 
+// for .jsx to get userID
+function getUser() {
+  return userIDRef
+}
+
 function debug(str){
   console.log("DEBUG: " + str)
   return  str
@@ -64,16 +72,25 @@ function debug(str){
 
 
 // POST onboarding responses 
-// WARNING: if userIDRef is not defined, then it will populated responses in users/ques_respon 
 function WriteOnboarding(ans){
   const db = getDatabase();
-  set(ref(db, 'users/' + userIDRef + '/ques_respon'), {
-    answ_1 : ans[0],
-    answ_2 : ans[1],
-    answ_3 : ans[2],
-    answ_4 : ans[3],
-    answ_5 : ans[4]
-  });
+  if (userIDRef){
+    set(ref(db, 'users/' + userIDRef + '/ques_respon'), {
+      answ_1 : ans[0],
+      answ_2 : ans[1],
+      answ_3 : ans[2],
+      answ_4 : ans[3],
+      answ_5 : ans[4]
+    }).then(() => {
+      // Data saved successfully!
+      console.log('SUCCESSFUL ONBOARDING')
+      cache.add(userIDRef)
+    })
+    .catch((error) => {
+      // The write failed...
+      console.log(error)
+    });
+  }
 
 }
 
@@ -85,11 +102,13 @@ function WriteDailyCheckIn( date, mood){
   date = date.replaceAll('/', '_')
   date = "date_" + date
 
-  const newKey = push(child(ref(db, 'users/' + userIDRef ), 'daily_mood')).key; // do not remove: need to force create a new entry, then overwrite key below
-  const updates = {};
-  updates[date] = mood;
 
-  update(ref(db, 'users/' + userIDRef + '/daily_mood' ), updates)
+  if(userIDRef){
+    const newKey = push(child(ref(db, 'users/' + userIDRef ), 'daily_mood')).key; // do not remove: need to force create a new entry, then overwrite key below
+    const updates = {};
+    updates[date] = mood;
+
+    update(ref(db, 'users/' + userIDRef + '/daily_mood' ), updates)
   .then(() => {
     // Data saved successfully!
     console.log('SUCCESS')
@@ -99,30 +118,32 @@ function WriteDailyCheckIn( date, mood){
     console.log(error)
   });
 
+  }
 }
 
 
-let cache = new Set()
-// GET check if user_ID has completed onboarding (check for non-empty que and ans) // if ANY is empty, return false
+
+// GET check if user_ID has completed onboarding (check for non-empty que and ans) // if ANY answ_res is empty, return false
 function checkOnboarded(user_id){
-  //console.log("fire.js: " + user_id)
-  
-  userIDRef = user_id
-  
-  if (!user_id) {
-    return false
-  }
+  console.log("fire.js: " + user_id)
 
   if (cache.has(user_id)) {
+    console.log("checkOnboarded: already onboarded!")
     return true
   } 
 
+  if (!user_id) {
+    console.log("checkOnboarded: no userid found")
+    return false
+
+  }
+
+ 
   const db = getDatabase();
   let res = false
  
   onValue(ref(db), (snapshot) => {
       for(let i = 1; i < 7; i++){
-        console.log(user_id)
         if (!snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)] || snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)].length == 0 ) {
             //console.log("false!!" + snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)].length);
             break;
@@ -336,7 +357,8 @@ let fireDB = {
   getUserID: getUserID,
   debug: debug,
   WriteDailyCheckIn: WriteDailyCheckIn,
-  WriteOnboarding: WriteOnboarding
+  WriteOnboarding: WriteOnboarding,
+  getUser: getUser
 };
 
 export default fireDB;

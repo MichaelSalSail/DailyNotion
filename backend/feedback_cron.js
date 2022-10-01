@@ -1,9 +1,15 @@
+const { Client } = require('@notionhq/client');
 const notionAPI = require('./notionAPI.js');
 const triggers = require('./msg_triggers.js');
 const utils = require('./utils.js');
+const cron = require('node-cron');
+const notion_info=require('./notion_tokens.js');
 
-// GET and POST to Firebase Realtime database
-const realtimeGetPost = async (msgs) => {
+// POST the notion GET responses and msgs to database
+const realtimeGetPost = async (msgs, notionGET) => {
+  console.log("In realtimeGetPost!");
+  console.log("The name of project page is",notionGET.get_proj.pg_name);
+  console.log("The name of template database is",notionGET.get_templ.db_name);
   // firebase-admin setup
   let admin = require("firebase-admin");
   let serviceAccount = require("./fire_admin_cred.json");
@@ -19,6 +25,10 @@ const realtimeGetPost = async (msgs) => {
   ref.once("value", function(snapshot) {
     // GET everything under 'users'
     example_users_tree=snapshot.val();
+    // set-up necessary properties
+    example_users_tree.example_1.project.api_resp[utils.nodeDate()]={"getProject":notionGET.get_proj};
+    example_users_tree.example_1.template.api_resp[utils.nodeDate()]={"getTemplate":notionGET.get_templ};
+    example_users_tree.example_1.feedback[utils.nodeDate()]={};
     // General+Specific trigger function results
     const all_triggers=[triggers.templ_inactive_week(example_users_tree.example_1.template.api_resp[utils.nodeDate()].getTemplate),
     triggers.proj_inactive_week(example_users_tree.example_1.project.api_resp[utils.nodeDate()].getProject),
@@ -45,10 +55,26 @@ const realtimeGetPost = async (msgs) => {
       }
     }
     console.log(feedback);
-    // POST everything under 'users/example'
-    //example_users_tree.example["im_here"]="hello";
-    //const exampleRef = ref.child('example');
-    //exampleRef.set(example_users_tree.example);
+    example_users_tree.example_1.feedback[utils.nodeDate()]=feedback;
+    // POST everything under 'users/example_1'
+    const exampleRef = ref.child('example_1');
+    exampleRef.set(example_users_tree.example_1);
+  });
+};
+
+// perform both Notion API GET requests and return a json containing both
+// then, call realtimeGetPost()
+const notionGET = async (msgs) => {
+  // Access template page
+  const templateIntgr = new Client({ auth : notion_info.template.tokens.intgr_token});
+  const templateId = notion_info.template.tokens.page_token;
+  // Access project page
+  const projIntgr = new Client({ auth : notion_info.project.tokens.intgr_token});
+  const projId = notion_info.project.tokens.page_token;
+  notionAPI.getProject(projIntgr,projId).then(get_proj => {
+    notionAPI.getTemplate(templateIntgr,templateId).then(get_templ => {
+      realtimeGetPost(msgs,{get_templ: get_templ, get_proj: get_proj});
+    });
   });
 };
 
@@ -70,8 +96,16 @@ const msgs_text= [
 ];
 const msgs_color=["red","red","green","green","red","green","yellow","green","blue","green"];
 const msgs={"text":msgs_text,"color":msgs_color};
+
+// create valid node-cron expressions
+let daily="0 22 * * *";
+let weekly="2 22 * * Sun";
+console.log(cron.validate(daily),cron.validate(weekly));
+
 // call function
-realtimeGetPost(msgs);
+cron.schedule("*/1 * * * *", function() {
+  notionGET(msgs);
+});
 
 
 

@@ -322,9 +322,15 @@ read_que_ans("example");
 // make a blank template for new users
 let user_skeleton= {
   "example": {
-    "daily_mood": {},
+    "daily_mood": {
+      "date_00_00_0000": 1
+    },
     "project": {
-      "api_resp": {},
+      "api_resp": { 
+        "date_00_00_0000": {
+          "sample":"sample"
+        }
+      },
       "tokens": {
         "intgr_token": "Internal_Integration_token_value",
         "page_token": "Database_token_value"
@@ -339,13 +345,24 @@ let user_skeleton= {
       "answ_6": []
     },
     "template": {
-      "api_resp": {},
+      "api_resp": { 
+        "date_00_00_0000": {
+          "sample":"sample"
+        }
+      },
       "tokens": {
         "intgr_token": "Internal_Integration_token_value",
         "page_token": "Database_token_value"
       }
     },
-    "feedback": {}
+    "feedback": {
+      "date_00_00_0000": {
+        "msg_0": {
+          "text":"???",
+          "color":"???"
+        }
+      }
+    }
   }
 }
 

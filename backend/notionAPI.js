@@ -1,6 +1,3 @@
-const { Client } = require('@notionhq/client');
-const notion_info=require('./notion_tokens.js');
-
 /**
  * Collects user activity on curated DailyNotion template space
  * @param {string} templateIntgr - associated template integration token
@@ -215,28 +212,6 @@ const entriesTempl = (user_type, week) => {
     else
         return [String(week),"???","???","???","???"];
 };
-
-//                               CONSTANTS
-// Access template page
-const templateIntgr = new Client({ auth : notion_info.template.tokens.intgr_token});
-const templateId = notion_info.template.tokens.page_token;
-// Access project page
-const projIntgr = new Client({ auth : notion_info.project.tokens.intgr_token});
-const projId = notion_info.project.tokens.page_token;
-
-// Example feedback for Notion project page
-let comment = "You're doing great! Keep it up."
-
-// Run all function calls and catch any errors
-/*try {
-    getTemplate(templateIntgr,templateId);
-    updateTemplate(templateIntgr,templateId,entriesTempl("Excessive Task Switching",2));
-    getProject(projIntgr,projId);
-    msgProject(projIntgr,projId,comment);
-}
-catch(error) {
-    console.log(error);
-}*/
 
 // Export functions to run in feedback_cron.js
 module.exports= {

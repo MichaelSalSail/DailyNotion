@@ -35,4 +35,6 @@ module.exports = {
     }
   }
 };
-```
+```  
+
+**UPDATED**: Ignore creating a notion_tokens.js file. Log-in to the web app and input your credentials from there.

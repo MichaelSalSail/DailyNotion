@@ -76,8 +76,8 @@ function WriteOnboarding(ans){
   const db = getDatabase();
   if (userIDRef){
     set(ref(db, 'users/' + userIDRef + '/ques_respon'), {
-      answ_1 : ans[0],
-      answ_2 : ans[1],
+      answ_1 : ans[0][0],
+      answ_2 : ans[1][0],
       answ_3 : ans[2],
       answ_4 : ans[3],
       answ_5 : ans[4]

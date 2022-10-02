@@ -17,10 +17,10 @@ const { useState} = React;
 
 // 'values' are passed to FireDB 
 const prod_problems = [
-    {label: 'Procrastination', value: '0'},
-    {label: 'Excessive Task Switching', value: '1'},
-    {label: 'Excessive Negative Thinking', value: '2'},
-    {label: 'Overwork (burnout)', value: '3'}
+    {label: 'Procrastination', value: 'Procrastination'},
+    {label: 'Excessive Task Switching', value: 'Excessive Task Switching'},
+    {label: 'Excessive Negative Thinking', value: 'Excessive Negative Thinking'},
+    {label: 'Overwork (burnout)', value: 'Overwork (burnout)'}
 ];
 
 const organizing_skills = [
@@ -32,13 +32,13 @@ const organizing_skills = [
 ];
 
 const weekdays = [
-    {label: 'Sunday', value: '0'},
-    {label: 'Monday', value: '1'},
-    {label: 'Tuesday', value: '2'},
-    {label: 'Wednesday', value: '3'},
-    {label: 'Thursday', value: '4'},
-    {label: 'Friday', value: '5'},
-    {label: 'Saturday', value: '6'}
+    {label: 'Sunday', value: '1'},
+    {label: 'Monday', value: '2'},
+    {label: 'Tuesday', value: '3'},
+    {label: 'Wednesday', value: '4'},
+    {label: 'Thursday', value: '5'},
+    {label: 'Friday', value: '6'},
+    {label: 'Saturday', value: '7'}
 ];
 
 const daytimes = [

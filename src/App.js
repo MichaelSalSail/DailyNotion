@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+
 
 
 import './App.css';
@@ -29,6 +29,7 @@ const App = () => {
   const [passwordError, setPasswordError] = useState('');
   const [hasAccount, setHasAccount] = useState(false);
 
+
   // reset values
   const clearInput = () => {
     setEmail('');
@@ -44,7 +45,8 @@ const App = () => {
   // If so, go to the Home page (Main.jsx)
   const handleLogin= () =>{
     clearError();
-    console.log("handling login..")
+
+
       signInWithEmailAndPassword(auth,email,password)
       .catch(err => {
         switch(err.code){
@@ -59,7 +61,9 @@ const App = () => {
         }
       });
       setCurrUser(fireDB.getUserID(email))
-
+      if (fireDB.checkOnboarded(fireDB.getUser())){
+        console.log("yes onboared")
+      }
 
 /*       if (fireDB.checkOnboarded(fireDB.getUser())){
         return <Navigate to='/Dashboard'/>
@@ -122,12 +126,14 @@ const App = () => {
           */}
 
 
-{user ? (
+{fireDB.getUser() ? (
           fireDB.checkOnboarded(fireDB.getUser()) ? (
             <Router>
                 <Routes>
-                <Route exact path="/Onboarding" 
+                <Route exact path="/" 
                         element={<Navigate to='/Dashboard'/>}/>
+                 <Route exact path="/Onboarding" 
+                        element={<Navigate to='/Dashboard'/>}/>       
                 <Route exact path="/Dashboard" 
                         element={<Main handleLogout={handleLogout} user={user} email={email}/>}/>
                 </Routes>

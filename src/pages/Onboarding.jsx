@@ -1,38 +1,27 @@
 import React from 'react';
 
+
+// For PrimeReact UI
 import { MultiSelect} from 'primereact/multiselect';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
- 
-
-
 import "primereact/resources/themes/lara-light-indigo/theme.css";  //theme
 import "primereact/resources/primereact.min.css";                  //core css
 import "primeicons/primeicons.css";                                //icons
 
+// For Routing & Accessing fireDB
 import fireDB from '../fire.js';
-
-import { useNavigate } from 'react-router-dom';
-
-import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
-
-import Main from './Main'
-
-import App from '../App'
-
 import { Navigate } from 'react-router-dom';
-import { Redirect } from "react-router-dom";
 
-const { useEffect, useState, useRef } = React;
+const { useState} = React;
 
-
+// 'values' are passed to FireDB 
 const prod_problems = [
     {label: 'Procrastination', value: '0'},
     {label: 'Excessive Task Switching (starting but never finishing)', value: '1'},
     {label: 'Excessive Negative Thinking', value: '2'},
     {label: 'Overwork (burnout)', value: '3'}
 ];
- 
 
 const organizing_skills = [
     {label: 'Terrible', value: '0'},
@@ -63,17 +52,14 @@ const daytimes = [
 ];
 
 
-
-
 const Onboarding = ({handleLogout, user, email}) =>{
-
 
     const [selectedQ1, setQ1] = useState(null)
     const [selectedQ2, setQ2] = useState(null)
     const [selectedQ3, setQ3] = useState(null)
     const [selectedQ4, setQ4] = useState(null)
     const [selectedQ5, setQ5] = useState(null)
-    const [toDash, setDash] = useState(false)
+    const [toDash, setDash] = useState(false)       // used to Navigate
 
     const footer = <span>
         <Button label="Submit" onClick={() => {handleSubmit();}} icon="pi pi-check" style={{marginRight: '.25em', width: '20em'}}/>
@@ -81,32 +67,22 @@ const Onboarding = ({handleLogout, user, email}) =>{
     </span> 
 
 
-    // to verify the selected values of the questions
-    function debug(){
-        
-        //console.log("handleSubmit() -> fireDB.getUser(): " + fireDB.getUser())
-        console.log(selectedQ1)
-        console.log(selectedQ2)
-        console.log(selectedQ3)
-        console.log(selectedQ4)
-        console.log(selectedQ5)
-    }
-
     function verifyAns(ans){ // verifies if the answers are non-empty
         if (ans.includes(null)){
             return false
         }
         for (let i = 0; i < ans.length; i++){
-            if (ans[i].length == 0){
+            if (ans[i].length === 0){
                 return false
             } 
         }
         return true
     }
 
+    // Posts to DB, and verifies Onboarding, triggering /Dashboard
     function handleSubmit(){
         let ans = [selectedQ1, selectedQ2, selectedQ3, selectedQ4, selectedQ5]
-        debug()
+        //debug()
             
         if (verifyAns(ans)){
             
@@ -121,7 +97,7 @@ const Onboarding = ({handleLogout, user, email}) =>{
             <div style={{margin:'3%'}}>
             <div style={{width: '60%'}}>
             <Card footer={footer} title="Welcome to DailyNotion!" subTitle="Please answer the questions below to get started">
-            <img width='300px' height='300px' src='/static/images/dark_daily_notion.png'/>
+            <img width='300px' height='300px' alt="happy sun with text below, daily notion" src='/static/images/dark_daily_notion.png'/>
             <h3> 1) What is your most common productivity hurdle? </h3> <br></br>
             <MultiSelect  showSelectAll="false" selectionLimit="1" placeholder="Select One" optionLabel="label" value={selectedQ1} options={prod_problems} onChange={(e) => setQ1(e.value)} />
             <br></br><br></br>
@@ -139,7 +115,6 @@ const Onboarding = ({handleLogout, user, email}) =>{
             
             </Card>
             </div>
-            
                 {toDash && (
                     <Navigate to="/Dashboard" replace={true} />
                     )}

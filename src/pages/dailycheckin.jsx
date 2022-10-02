@@ -5,7 +5,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
-import Button from '@mui/material/Button';
+import { Button } from 'primereact/button';
 
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
@@ -103,12 +103,12 @@ export default function DailyCheckIn() {
       highlightSelectedOnly
       onChange={handleMoodChange}
     />  
-    <br></br>
+    <br></br><br></br>
     <Button   
       onClick={() => {
       handleSubmit();
      }} 
-     variant="contained"> Submit </Button>
+     variant="contained" style={{justifyContent: 'center'}}> Submit </Button>
     </div>
 
   );

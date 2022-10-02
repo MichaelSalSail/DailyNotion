@@ -1,9 +1,11 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
-import ButtonGroup from '@mui/material/ButtonGroup';
-import Button from '@mui/material/Button';
 
-import DailyCheckIn from './dailycheckin.jsx'
+// Tab Pages
+import DailyCheckIn from './dailycheckin.jsx';
+import Settings from './settings.jsx';
+//import MoodBoard from './moodboard.jsx';
+
+
 
 // For Tabs
 import PropTypes from 'prop-types';
@@ -15,11 +17,16 @@ import DailyCheckIcon from '@mui/icons-material/EmojiFoodBeverage';
 import SettingsIcon from '@mui/icons-material/Settings';
 import MoodBoardIcon from '@mui/icons-material/Dashboard';
 
+
 // Tabs
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
   
+    
+
+
     return (
+      
       <div
         role="tabpanel"
         hidden={value !== index}
@@ -35,8 +42,6 @@ function TabPanel(props) {
       </div>
     );
   }
-
-
 
   TabPanel.propTypes = {
     children: PropTypes.node,
@@ -59,10 +64,10 @@ function TabPanel(props) {
     };
   
     return (
+      <div>
       <Box sx={{ width: '100%' }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" centered>
-            
             <Tab icon={<DailyCheckIcon/>} label="Daily Check In" {...a11yProps(0)} />
             <Tab icon={<MoodBoardIcon/>}label="Mood Board" {...a11yProps(1)} />
             <Tab icon={<SettingsIcon/>}label="Settings" {...a11yProps(2)} />
@@ -77,8 +82,7 @@ function TabPanel(props) {
                     <DailyCheckIn></DailyCheckIn>
                 </div>
                 <div class="column">
-                    <h2> Welcome to Daily Check-In!</h2>
-                    <p> Answer a few questions </p>
+                    <img width='300px' height='300px' alt="happy sun with text below, daily notion" src='/static/images/dark_daily_notion.png'/>
                 </div>
                 </div>
           </div>
@@ -88,9 +92,9 @@ function TabPanel(props) {
         </TabPanel>
         <TabPanel value={value} index={2}>
         {/* TO DO: Settings page => update username, update notion API, log out, delete acct*/}
-          Item Three
+          <Settings></Settings>
         </TabPanel>
-      </Box>
+      </Box></div>
     );
   }
 

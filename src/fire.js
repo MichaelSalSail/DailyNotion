@@ -94,6 +94,81 @@ function WriteOnboarding(ans){
 
 }
 
+
+// POST project intgr_token
+function WriteProject_IT(token){
+  const db = getDatabase();
+  const updates = {};
+  updates['intgr_token'] = token;
+  if(token){
+    update(ref(db, 'users/' + userIDRef + '/project/tokens' ), updates)
+    .then(() => {
+      // Data saved successfully!
+      console.log('SUCCESS')
+    })
+    .catch((error) => {
+      // The write failed...
+      console.log(error)
+    });
+  }
+
+}
+
+// POST project page_token
+function WriteProject_PT(token){
+  const db = getDatabase();
+  const updates = {};
+  updates['page_token'] = token;
+  if(token){
+    update(ref(db, 'users/' + userIDRef + '/project/tokens' ), updates)
+    .then(() => {
+      // Data saved successfully!
+      console.log('SUCCESS')
+    })
+    .catch((error) => {
+      // The write failed...
+      console.log(error)
+    });
+  }
+
+}
+
+// POST template intgr_token
+function WriteTemplate_IT(token){
+  const db = getDatabase();
+  const updates = {};
+  updates['intgr_token'] = token;
+  if(token){
+    update(ref(db, 'users/' + userIDRef + '/template/tokens' ), updates)
+    .then(() => {
+      // Data saved successfully!
+      console.log('SUCCESS')
+    })
+    .catch((error) => {
+      // The write failed...
+      console.log(error)
+    });
+  }
+}
+
+// POST template page_token
+function WriteTemplate_PT(token){
+  const db = getDatabase();
+  const updates = {};
+  updates['page_token'] = token;
+  if(token){
+    update(ref(db, 'users/' + userIDRef + '/template/tokens' ), updates)
+    .then(() => {
+      // Data saved successfully!
+      console.log('SUCCESS')
+    })
+    .catch((error) => {
+      // The write failed...
+      console.log(error)
+    });
+  }
+}
+
 // POST daily check in submission
 function WriteDailyCheckIn( date, mood){
   const db = getDatabase();
@@ -104,7 +179,7 @@ function WriteDailyCheckIn( date, mood){
 
 
   if(userIDRef){
-    const newKey = push(child(ref(db, 'users/' + userIDRef ), 'daily_mood')).key; // do not remove: need to force create a new entry, then overwrite key below
+    push(child(ref(db, 'users/' + userIDRef ), 'daily_mood')); // do not remove: need to force create a new entry, then overwrite key below
     const updates = {};
     updates[date] = mood;
 
@@ -125,36 +200,34 @@ function WriteDailyCheckIn( date, mood){
 
 // GET check if user_ID has completed onboarding (check for non-empty que and ans) // if ANY answ_res is empty, return false
 function checkOnboarded(user_id){
-  console.log("fire.js: " + user_id)
+  user_id = userIDRef
+  //console.log("fire.js: " + user_id)
 
   if (cache.has(user_id)) {
-    console.log("checkOnboarded: already onboarded!")
+    //console.log("checkOnboarded: already onboarded!")
     return true
   } 
-
-  if (!user_id) {
-    console.log("checkOnboarded: no userid found")
-    return false
-
-  }
-
  
   const db = getDatabase();
   let res = false
  
-  onValue(ref(db), (snapshot) => {
-      for(let i = 1; i < 7; i++){
-        if (!snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)] || snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)].length == 0 ) {
-            //console.log("false!!" + snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)].length);
+  if (user_id){
+    onValue(ref(db), (snapshot) => {
+      for(let i = 1; i <= 5; i++){
+        if (!snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)][0] || snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)][0].length === 0 ) {
+            //console.log("false!!" + snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)]);
             break;
         } else {
           cache.add(user_id)
+          //console.log("true!!" + snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)]);
           res = true // only returns true if every ans is non-empty
+ 
         }
-      }
-      
+      }    
   })
   return res
+  }
+  
 }
 
 
@@ -358,7 +431,11 @@ let fireDB = {
   debug: debug,
   WriteDailyCheckIn: WriteDailyCheckIn,
   WriteOnboarding: WriteOnboarding,
-  getUser: getUser
+  getUser: getUser,
+  WriteProject_IT: WriteProject_IT,
+  WriteProject_PT: WriteProject_PT,
+  WriteTemplate_IT: WriteTemplate_IT,
+  WriteTemplate_PT:WriteTemplate_PT
 };
 
 export default fireDB;

@@ -18,7 +18,7 @@ const { useState} = React;
 // 'values' are passed to FireDB 
 const prod_problems = [
     {label: 'Procrastination', value: '0'},
-    {label: 'Excessive Task Switching (starting but never finishing)', value: '1'},
+    {label: 'Excessive Task Switching', value: '1'},
     {label: 'Excessive Negative Thinking', value: '2'},
     {label: 'Overwork (burnout)', value: '3'}
 ];

@@ -65,7 +65,7 @@ IconContainer.propTypes = {
 
 export default function DailyCheckIn() {
   const [DateValue, setDateValue] = React.useState(new Date());
-  const [MoodValue, setMoodValue] = React.useState('3');
+  const [MoodValue, setMoodValue] = React.useState(3);
 
   const handleDateChange = (newValue) => {
     setDateValue(newValue);
@@ -73,7 +73,7 @@ export default function DailyCheckIn() {
   };
 
   const handleMoodChange = (newValue) => {
-    setMoodValue(newValue.target.value);
+    setMoodValue(Number(newValue.target.value));
   };
 
   function handleSubmit() {

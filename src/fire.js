@@ -572,7 +572,7 @@ let user_skeleton= {
 }
 
 
-writeUserInfo(user_skeleton);
+// writeUserInfo(user_skeleton);
 
 let fireDB = {
   fire_app: fire_app,

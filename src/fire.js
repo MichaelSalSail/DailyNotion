@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import {initializeApp} from 'firebase/app'
-import {getDatabase, ref, onValue, set, child, get} from 'firebase/database';
+import {getDatabase, ref, onValue, set, update, push, child} from 'firebase/database';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -20,6 +20,12 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const fire_app = initializeApp(firebaseConfig);
+
+// Reference value for user
+let userIDRef = ''
+
+// Cache for onboarded userID
+let cache = new Set()
 
 // POST references under 'references' node on Firebase Realtime
 function writeRefrnces(refr_info) {
@@ -45,6 +51,210 @@ function writeUserInfo(user_info) {
   }
 }
 
+
+// CONVERT user_email to user_id
+function getUserID(user_email){
+  let reg_exp=/[@.]/g;
+  const user_id=user_email.replaceAll(reg_exp,"_");
+  userIDRef = user_id
+  return user_id
+}
+
+// for .jsx to get userID
+function getUser() {
+  return userIDRef
+}
+
+function debug(str){
+  console.log("DEBUG: " + str)
+  return  str
+}
+
+
+// POST onboarding responses 
+function WriteOnboarding(ans){
+  const db = getDatabase();
+  if (userIDRef){
+    set(ref(db, 'users/' + userIDRef + '/ques_respon'), {
+      answ_1 : ans[0][0],
+      answ_2 : ans[1][0],
+      answ_3 : ans[2],
+      answ_4 : ans[3],
+      answ_5 : ans[4]
+    }).then(() => {
+      // Data saved successfully!
+      console.log('SUCCESSFUL ONBOARDING')
+      cache.add(userIDRef)
+    })
+    .catch((error) => {
+      // The write failed...
+      console.log(error)
+    });
+  }
+
+}
+
+
+// POST project intgr_token
+function WriteProject_IT(token){
+  const db = getDatabase();
+  const updates = {};
+  updates['intgr_token'] = token;
+  if(token){
+    update(ref(db, 'users/' + userIDRef + '/project/tokens' ), updates)
+    .then(() => {
+      // Data saved successfully!
+      console.log('SUCCESS')
+    })
+    .catch((error) => {
+      // The write failed...
+      console.log(error)
+    });
+  }
+
+}
+
+// POST project page_token
+function WriteProject_PT(token){
+  const db = getDatabase();
+  const updates = {};
+  updates['page_token'] = token;
+  if(token){
+    update(ref(db, 'users/' + userIDRef + '/project/tokens' ), updates)
+    .then(() => {
+      // Data saved successfully!
+      console.log('SUCCESS')
+    })
+    .catch((error) => {
+      // The write failed...
+      console.log(error)
+    });
+  }
+
+}
+
+// POST template intgr_token
+function WriteTemplate_IT(token){
+  const db = getDatabase();
+  const updates = {};
+  updates['intgr_token'] = token;
+  if(token){
+    update(ref(db, 'users/' + userIDRef + '/template/tokens' ), updates)
+    .then(() => {
+      // Data saved successfully!
+      console.log('SUCCESS')
+    })
+    .catch((error) => {
+      // The write failed...
+      console.log(error)
+    });
+  }
+}
+// GET TemplateLink to show user
+function getTemplateLink(){
+  let problem = ''
+  const db = getDatabase();
+  if(userIDRef){
+    onValue(ref(db), (snapshot) => {
+      problem = (snapshot.val()["users"][userIDRef]["ques_respon"]["answ_1"])
+  });
+  }
+
+  switch(problem) {
+    case 'Procrastination':
+      return 'https://giant-hammer-3aa.notion.site/Task-Logger-cf6395172d524fa38a05cf2f29958657'
+    case 'Excessive Task Switching':
+      return 'https://giant-hammer-3aa.notion.site/Goal-Setting-aa154c07dd0b48af891907181acf1133'
+    case 'Excessive Negative Thinking':
+      return 'https://giant-hammer-3aa.notion.site/Positivity-7e72ad86fd494f759d521ea0bd3aff34'
+    case 'Overwork (burnout)':
+      return 'https://giant-hammer-3aa.notion.site/Balance-8a5826b3236d4fec9f300d140dd169c8'
+    default:
+      return 'https://giant-hammer-3aa.notion.site/Task-Logger-cf6395172d524fa38a05cf2f29958657' // just returning procrastination by default..
+  } 
+}
+
+// POST template page_token
+function WriteTemplate_PT(token){
+  const db = getDatabase();
+  const updates = {};
+  updates['page_token'] = token;
+  if(token){
+    update(ref(db, 'users/' + userIDRef + '/template/tokens' ), updates)
+    .then(() => {
+      // Data saved successfully!
+      console.log('SUCCESS')
+    })
+    .catch((error) => {
+      // The write failed...
+      console.log(error)
+    });
+  }
+}
+
+// POST daily check in submission
+function WriteDailyCheckIn( date, mood){
+  const db = getDatabase();
+
+  date = date.toLocaleDateString()
+  date = date.replaceAll('/', '_')
+  date = "date_" + date
+
+
+  if(userIDRef){
+    push(child(ref(db, 'users/' + userIDRef ), 'daily_mood')); // do not remove: need to force create a new entry, then overwrite key below
+    const updates = {};
+    updates[date] = mood;
+
+    update(ref(db, 'users/' + userIDRef + '/daily_mood' ), updates)
+  .then(() => {
+    // Data saved successfully!
+    console.log('SUCCESS')
+  })
+  .catch((error) => {
+    // The write failed...
+    console.log(error)
+  });
+
+  }
+}
+
+
+
+// GET check if user_ID has completed onboarding (check for non-empty que and ans) // if ANY answ_res is empty, return false
+function checkOnboarded(user_id){
+  user_id = userIDRef
+  //console.log("fire.js: " + user_id)
+
+  if (cache.has(user_id)) {
+    //console.log("checkOnboarded: already onboarded!")
+    return true
+  } 
+ 
+  const db = getDatabase();
+  let res = false
+ 
+  if (user_id){
+    onValue(ref(db), (snapshot) => {
+      for(let i = 1; i <= 5; i++){
+        if (!snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)][0] || snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)][0].length === 0 ) {
+            //console.log("false!!" + snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)]);
+            break;
+        } else {
+          cache.add(user_id)
+          //console.log("true!!" + snapshot.val()["users"][user_id]["ques_respon"]["answ_" + String(i)]);
+          res = true // only returns true if every ans is non-empty
+ 
+        }
+      }    
+  })
+  return res
+  }
+  
+}
+
+
+
 // GET question+response data on user user_id through Firebase Realtime
 function read_que_ans(user_id) {
   const db = getDatabase();
@@ -69,6 +279,7 @@ function set_new_user(user_json, user_email) {
   user_json[user_id] = user_json["example"];
   delete user_json["example"];
   // POST to repo
+  userIDRef = user_id
   writeUserInfo(user_json);
 }
 
@@ -179,18 +390,7 @@ const template_space={
         },
         "updateTemplate": {
             object: 'page',
-            created_time: 'Thu Sep 22 2022 23:37:00 GMT-0400 (Eastern Daylight Time)',
-            parent: {
-            type: 'database_id',
-            database_id: '12903875-e42d-112e-9690-810719d1c18f' 
-            },
-            properties: {
-            'Question 3': { id: 'UOob', type: 'rich_text', rich_text: [Array] },
-            'Question 4': { id: 'tHma', type: 'rich_text', rich_text: [Array] },
-            'Question 2': { id: 'tc~%40', type: 'rich_text', rich_text: [Array] },
-            'Question 1': { id: 'u%7C%3DI', type: 'rich_text', rich_text: [Array] },
-            Week: { id: 'title', type: 'title', title: [Array] }
-            }
+            created_time: 'Thu Sep 22 2022 23:37:00 GMT-0400 (Eastern Daylight Time)'
         }
     }
   },
@@ -316,11 +516,12 @@ let example_all={
 }
 writeUserInfo(example_all);
 
-// user "example" is a dummy example
-read_que_ans("example");
 
+//read_que_ans("example");
+//checkOnboarded("example");
 // make a blank template for new users
 let user_skeleton= {
+  // user "example" is a dummy example
   "example": {
     "daily_mood": {
       "date_00_00_0000": 1
@@ -339,10 +540,10 @@ let user_skeleton= {
     "ques_respon": {
       "answ_1": "",
       "answ_2": "",
-      "answ_3": [],
-      "answ_4": [],
-      "answ_5": [],
-      "answ_6": []
+      "answ_3": [""],
+      "answ_4": [""],
+      "answ_5": [""],
+      "answ_6": [""]
     },
     "template": {
       "api_resp": { 
@@ -357,19 +558,37 @@ let user_skeleton= {
     },
     "feedback": {
       "date_00_00_0000": {
-        "msg_0": {
-          "text":"???",
-          "color":"???"
+        "msg_1": {
+          "text":"You need to correct something.",
+          "color":"red"
+        },
+        "msg_2": {
+          "text":"This is a positive message.",
+          "color":"green"
         }
       }
     }
   }
 }
 
+
+writeUserInfo(user_skeleton);
+
 let fireDB = {
   fire_app: fire_app,
   user_skeleton: user_skeleton,
-  set_new_user: set_new_user
+  set_new_user: set_new_user,
+  checkOnboarded: checkOnboarded,
+  getUserID: getUserID,
+  debug: debug,
+  WriteDailyCheckIn: WriteDailyCheckIn,
+  WriteOnboarding: WriteOnboarding,
+  getUser: getUser,
+  WriteProject_IT: WriteProject_IT,
+  WriteProject_PT: WriteProject_PT,
+  WriteTemplate_IT: WriteTemplate_IT,
+  WriteTemplate_PT:WriteTemplate_PT,
+  getTemplateLink: getTemplateLink
 };
 
 export default fireDB;

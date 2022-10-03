@@ -150,6 +150,29 @@ function WriteTemplate_IT(token){
     });
   }
 }
+// GET TemplateLink to show user
+function getTemplateLink(){
+  let problem = ''
+  const db = getDatabase();
+  if(userIDRef){
+    onValue(ref(db), (snapshot) => {
+      problem = (snapshot.val()["users"][userIDRef]["ques_respon"]["answ_1"])
+  });
+  }
+
+  switch(problem) {
+    case 'Procrastination':
+      return 'https://giant-hammer-3aa.notion.site/Task-Logger-cf6395172d524fa38a05cf2f29958657'
+    case 'Excessive Task Switching':
+      return 'https://giant-hammer-3aa.notion.site/Goal-Setting-aa154c07dd0b48af891907181acf1133'
+    case 'Excessive Negative Thinking':
+      return 'https://giant-hammer-3aa.notion.site/Positivity-7e72ad86fd494f759d521ea0bd3aff34'
+    case 'Overwork (burnout)':
+      return 'https://giant-hammer-3aa.notion.site/Balance-8a5826b3236d4fec9f300d140dd169c8'
+    default:
+      return 'https://giant-hammer-3aa.notion.site/Task-Logger-cf6395172d524fa38a05cf2f29958657' // just returning procrastination by default..
+  } 
+}
 
 // POST template page_token
 function WriteTemplate_PT(token){
@@ -564,7 +587,8 @@ let fireDB = {
   WriteProject_IT: WriteProject_IT,
   WriteProject_PT: WriteProject_PT,
   WriteTemplate_IT: WriteTemplate_IT,
-  WriteTemplate_PT:WriteTemplate_PT
+  WriteTemplate_PT:WriteTemplate_PT,
+  getTemplateLink: getTemplateLink
 };
 
 export default fireDB;

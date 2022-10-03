@@ -8,6 +8,13 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";  //theme
 import "primereact/resources/primereact.min.css";                  //core css
 import "primeicons/primeicons.css";                                //icons
 
+import Collapse from '@mui/material/Collapse';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+
 // For Accessing fireDB
 import fireDB from '../fire.js';
 
@@ -44,12 +51,58 @@ import fireDB from '../fire.js';
         fireDB.WriteTemplate_PT(TemplateDatabase_Token)
     }  
 
+    function TemplateInfoCollapse(){
+        const templateLink = React.useState(fireDB.getTemplateLink());
+        const [open, setOpen] = React.useState(false);
+        const handleClick = () => {
+            setOpen(!open);
+          };
+
+          //console.log(templateLink[0])
+        return (
+          
+              <div>
+                <List
+                sx={{ width: '100%', bgcolor: 'background.paper' }}
+                component="nav"
+                aria-labelledby="nested-list-subheader">
+
+                <ListItemButton onClick={handleClick}>
+                    <ListItemText> <h1> Notion API Templates </h1> </ListItemText>
+                    {open ? <ExpandLess /> : <ExpandMore />}
+                </ListItemButton>
+
+                <Collapse in={open} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                            <div>
+                            <p> Hey! Based off your preferences, we recommend you to duplicate the following Notion Template below:</p>
+                            <br></br>
+                            <a href={templateLink[0]}> Notion Template API </a>
+                            <br></br><br></br>
+                            <p> In order for our DailyNotion API to work, we need the token values for both your project notion page, and the template page above.</p> 
+                            </div>
+                    </List>
+                </Collapse>
+
+                </List>
+              </div>
+
+        );
+    }
+
     // in retrospect, using <span> for inline might been better
     return (
       <div> 
 
             <h1> Settings </h1>
             <br></br>
+            <Card>
+                 <div >
+                    <TemplateInfoCollapse></TemplateInfoCollapse>
+                </div>
+            </Card>
+            <br></br><br></br><br></br>
+
             <Card margin='50%' >
                  <div >
                 <h3> Project Page Token </h3>

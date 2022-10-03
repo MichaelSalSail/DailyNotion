@@ -69,8 +69,8 @@ function TabPanel(props) {
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" centered>
             <Tab icon={<DailyCheckIcon/>} label="Daily Check In" {...a11yProps(0)} />
-            <Tab icon={<MoodBoardIcon/>}label="Mood Board" {...a11yProps(1)} />
-            <Tab icon={<SettingsIcon/>}label="Settings" {...a11yProps(2)} />
+            {/* <Tab icon={<MoodBoardIcon/>}label="Mood Board" {...a11yProps(1)} /> */}
+            <Tab icon={<SettingsIcon/>}label="Settings" {...a11yProps(1)} />
           </Tabs>
         </Box>
        
@@ -87,10 +87,10 @@ function TabPanel(props) {
                 </div>
           </div>
         </TabPanel>
-        <TabPanel value={value} index={1}>
+        <TabPanel value={value} index={2}>
           Item Two
         </TabPanel>
-        <TabPanel value={value} index={2}>
+        <TabPanel value={value} index={1}>
         {/* TO DO: Settings page => update username, update notion API, log out, delete acct*/}
           <Settings></Settings>
         </TabPanel>

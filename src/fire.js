@@ -196,10 +196,6 @@ function WriteTemplate_PT(token){
 function WriteDailyCheckIn( date, mood){
   const db = getDatabase();
 
-  date = date.toLocaleDateString()
-  date = date.replaceAll('/', '_')
-  date = "date_" + date
-
 
   if(userIDRef){
     push(child(ref(db, 'users/' + userIDRef ), 'daily_mood')); // do not remove: need to force create a new entry, then overwrite key below

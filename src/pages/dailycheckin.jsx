@@ -19,7 +19,7 @@ import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt
 import SentimentVerySatisfiedIcon from '@mui/icons-material/SentimentVerySatisfied';
 
 import {Alert} from "@mui/material";
-import {nodeRecent} from '../utils.js';
+import {nodeDate, nodeRecent} from '../utils.js';
 
 import fireDB from '../fire.js';
 import {getDatabase, ref, onValue, set, update, push, child, get} from 'firebase/database';
@@ -77,7 +77,7 @@ export default function DailyCheckIn() {
   };
 
   function handleSubmit() {
-      fireDB.WriteDailyCheckIn(DateValue, MoodValue);
+      fireDB.WriteDailyCheckIn(nodeDate(), MoodValue);
   };
 
   const [disabled, setDisable] = React.useState(false);

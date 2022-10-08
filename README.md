@@ -27,9 +27,7 @@ Putting everything together, our app positively influences user behavior by enco
 - Consistancy in tracking mood and making edits to project page
 - Awareness by reading feedback messages concerning their progress
 - Reflection by giving responses to the questionnaire and answering open-ended questions in the template  
-![image info](./public/static/images/readme/questionnaire.png)
-![image info](./public/static/images/readme/msgs_dailymood.png)
-![image info](./public/static/images/readme/tokens.png)
+![image info](./public/static/images/readme/web_app.png)
 ![image info](./public/static/images/readme/comment.gif)
 # Languages/Dependencies
 This project is written in NodeJS and React. User data is stored in Firebase. Notion workspace data is extracted using the Notion API NodeJS SDK.  
